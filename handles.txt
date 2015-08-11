@@ -1,0 +1,96 @@
+valuewalk, research
+harvardbiz, research
+seekingalpha, research
+IBDinvestors, research
+TheStreet, research
+whitehouse, market influencer
+MarketPlunger, market influencer
+pmarca, market influencer
+ritholtz, market influencer
+JimPethokoukis, market influencer
+EddyElfenbein, market influencer
+realDonaldTrump, market influencer
+allstarcharts, market influencer
+barnejek, market influencer
+jack, market influencer
+jfahmy, market influencer
+jposhaughnessy, market influencer
+elerianm, market influencer
+federalreserve, market influencer
+BillGates, market influencer
+TomOrlik, market influencer
+elonmusk, market influencer
+davidjpowell24, market influencer
+MarkArbeter, market influencer
+PIMCO, market influencer
+AswathDamodaran, market influencer
+Carl_C_Icahn, market influencer
+aJobCreator, market influencer
+@theeconomist, news
+newscientist, news
+mental_floss, news
+huffingtonpost, news
+bbcworld, news
+foxnews, news
+nytimes, news
+slate, news
+mashable, news
+drudge_report, news
+washingtonpost, news
+eonline, news
+telegraphnews, news
+time, news
+wsj, news
+usatoday, news
+usabreakingnews, news
+politico, news
+latimes, news
+nytimesbusiness, news
+techcrunch, news
+engadget, news
+yahoonews, news
+socialmedia2day, news
+breakingnews, news
+guardiannews, news
+cbsnews, news
+msnbc, news
+cnnmoney, news
+reddit, news
+reutersworld, news
+verge, news
+cnetnews, news
+todayshow, news
+cnn, news
+instyle, news
+dvolatility, news
+slashdot, news
+arstechnica, news
+pastemagazine, news
+wired, news
+newsweek, news
+rww, news
+rollingstone, news
+cnnbrk, news
+io9, news
+sciam, news
+gizmodo, news
+good, news
+nprpolitics, news
+mckquarterly, news
+empiremagazine, news
+echreview, news
+bbcbreaking, news
+parisreview, news
+guardiantech, news
+davos, news
+discovermag, news
+sciencenewsorg, news
+tvnewser, news
+planetmoney, news
+freakonomics, news
+technology, news
+waitwait, news
+newyorkpost, news
+msnbc_breaking, news
+big_picture, news
+seedmag, new
