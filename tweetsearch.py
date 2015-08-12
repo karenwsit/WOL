@@ -2,6 +2,8 @@ import os
 import datetime
 import twitter
 
+#Twitter OAuth
+#Pulling twitter_consumer_key from my environment. Environ is a dictionary. os.environ accesses specific environment 
 
 api = twitter.Api(
 	consumer_key=os.environ['TWITTER_CONSUMER_KEY'],
@@ -9,13 +11,10 @@ api = twitter.Api(
     access_token_key=os.environ['TWITTER_ACCESS_TOKEN_KEY'],
     access_token_secret=os.environ['TWITTER_ACCESS_TOKEN_SECRET'])
 
-#pulling from my environment the twitter_consumer_key. Environ is a dictionary! os.environ accessing specific environment
-#print os.environ
 
-def search_handles(stock, handle_list, start_date=None, end_date=None):
-	# if end_date is None:
-	# 	end_date = datetime.datetime.now().strftime('%Y-%m-%d')
-	# 	print end_date
+
+def search_todays_tweets(stock, handle_list, start_date, end_date):
+	"""Given stock name, return queried tweets from a list of twitter handles for today"""
 
 	for handle in handle_list:
 		query = '%s+from=%s+since=%s+until=%s' % (stock, handle, start_date, end_date)

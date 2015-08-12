@@ -75,14 +75,18 @@ training_set = nltk.classify.apply_features(extract_features, tweets)
 
 #train the classifer
 classifier = nltk.NaiveBayesClassifier.train(training_set)
-# print 'accuracy:', nltk.classify.util.accuracy(classifier, test_tweets)
+print 'accuracy:', nltk.classify.util.accuracy(classifier, test_tweets)
+
+# dist = classifier.prob_classify(features)
+# for label in dist.samples():
+#     print("%s: %f" % (label, dist.prob(label)))
 
 classifier.classify(extract_features(tweet.split()))
 classifier_object = classifier.prob_classify(extract_features(tweet.split()))
 classifier_object.logprob('positive')
 classified_object.logprob('negative')
 
-print 'precision:', nltk.metrics
+# print 'precision:', nltk.metrics
 
 
 # def word_feats(words):

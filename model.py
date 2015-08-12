@@ -1,7 +1,7 @@
 """Models and database functions for WOL project"""
 
 from flask_sqlalchemy import SQLAlchemy
-from datetime import DateTime
+from datetime import datetime
 
 db = SQLAlchemy()
 
@@ -28,8 +28,7 @@ class Stock(db.Model):
 
 	def __repr__(self):
 		"""Provides helpful representation when printed"""
-		return "<Stock stockticker_id=%s stock_name=%s>" % (self.stock
-ticker_id, self.stock_name)
+		return "<Stock stockticker_id=%s stock_name=%s>" % (self.stockticker_id, self.stock_name)
 
 class UserStock(db.Model):
 	"""Reference table for User and Stock"""
@@ -48,8 +47,7 @@ class UserStock(db.Model):
 
 	def __repr__(self):
 		"""Provides helpful representation when printed"""
-		return "<UserStock userstock_id=%s user_id=%s stockticker_id=%s>" % (self.userstock_id, self.user_id, self.stock
-ticker_id)
+		return "<UserStock userstock_id=%s user_id=%s stockticker_id=%s>" % (self.userstock_id, self.user_id, self.stockticker_id)
 
 class TwitterHandle(db.Model):
 	"""TwitterHandle to query from"""
@@ -62,7 +60,7 @@ class TwitterHandle(db.Model):
 
 	def __repr__(self):
 		"""Provides helpful representation when printed"""
-		return "<TwitterHandle twitter_handle_id=%s twitter_handle_name=%s>" % (self.twitter_handle_id self.twitter_handle_name)
+		return "<TwitterHandle twitter_handle_id=%s twitter_handle_name=%s twitterhandle_type=%s>" % (self.twitter_handle_id, self.twitter_handle_name, self.twitterhandle_type)
 
 class Tweet(db.Model):
 	"""Queried tweets from twitterhandles"""
@@ -74,7 +72,7 @@ class Tweet(db.Model):
 	tweet_txt = db.Column(db.String(150), nullable=False)
 	tweet_url = db.Column(db.String(150))
 	stockticker_id = db.Column(db.String(10), db.ForeignKey('stocks.stockticker_id'))
-	twitterhandle_id = db.Column(db.Integer, db.ForeignKey('twitterhandles.twitter_handle_id'))
+	twitterhandle_id = db.Column(db.Integer, db.ForeignKey('twitterhandles.twitterhandle_id'))
 
 	#Define relationship to stock
 	stock = db.relationship("Stock", backref=db.backref("tweets", order_by=tweet_id))
@@ -84,8 +82,7 @@ class Tweet(db.Model):
 
 	def __repr__(self):
 		"""Provides helpful representation when printed"""
-		return "<Tweet tweet_id=%s tweet_created_at=%s tweet_txt=%s tweet_url=%s stockticker_id=%s twitter_handle_id=%s>" % (self.tweet_id self.tweet_created_at self.tweet_txt self.tweet_url self.stock
-ticker_id self.twitter_handle_id)
+		return "<Tweet tweet_id=%s tweet_created_at=%s tweet_txt=%s tweet_url=%s stockticker_id=%s twitter_handle_id=%s>" % (self.tweet_id, self.tweet_created_at, self.tweet_txt, self.tweet_url, self.stockticker_id, self.twitterhandle_id)
 
 class Sentiment(db.Model):
 	"""Sentiment for each day"""
@@ -97,11 +94,10 @@ class Sentiment(db.Model):
 	end_date = db.Column(db.DateTime)
 	sentiment = db.Column(db.Boolean, nullable=False)
 	likelihood_probability = db.Column(db.Float, nullable=False)
-	graph_value = db.Column(db.Float, nullable=False)
 
 	def __repr__(self):
 		"""Provides helpful representation when printed"""
-		return "<Sentiment sentiment_id=%s start_date=%s end_date=%s sentiment=%s likelihood_probability=%s graph_value=%s>" % (self.sentiment_id self.start_date self.end_date self.sentiment self.likelihood_probability self.graph_value)
+		return "<Sentiment sentiment_id=%s start_date=%s end_date=%s sentiment=%s likelihood_probability=%s>" % (self.sentiment_id, self.start_date, self.end_date, self.sentiment, self.likelihood_probability)
 
 class TweetSentiment(db.Model):
 	"""Reference table for Tweet and Sentiment"""
@@ -118,9 +114,9 @@ class TweetSentiment(db.Model):
 	#Define relaionship to sentiment
 	sentiment = db.relationship("Sentiment", backref=db.backref("tweetsentiments", order_by=tweetsentiment_id))
 
-		def __repr__(self):
-			"""Provides helpful representation when printed"""
-			return "<TweetSentiment tweetsentiment_id=%s tweet_id=%s sentiment_id=%s>" % (self.tweetsentiment_id self.tweet_id self.sentiment_id)
+	def __repr__(self):
+		"""Provides helpful representation when printed"""
+		return "<TweetSentiment tweetsentiment_id=%s tweet_id=%s sentiment_id=%s>" % (self.tweetsentiment_id, self.tweet_id, self.sentiment_id)
 
 ##########################################################################
 
@@ -128,7 +124,7 @@ def connect_to_db(app):
 	"""Connect database to Flask app."""
 
 	#Configure to use SQLite database
-	app.figure['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///wol.db'
+	app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///wol.db'
 	db.app = app
 	db.init_app(app)
 
