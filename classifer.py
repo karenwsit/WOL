@@ -3,13 +3,11 @@ from nltk.probability import FreqDist, ConditionalFreqDist
 from nltk.metrics import BigramAssocMeasures
 import nltk.classify.util
 import re
-# from nltk.corpus import movie_reviews
 
 """
 Training & Testing NaiveBayesClassifier
 
 """
-
 
 test_tweets = [
     (['feel', 'happy', 'this', 'morning'], 'positive'),

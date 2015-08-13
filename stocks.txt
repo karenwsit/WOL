@@ -1,0 +1,9 @@
+GOOG | Google
+TSLA | Tesla
+CMG | Chipotle
+DIS | Disney
+AAPL | Apple
+NKE | Nike
+BABA | Alibaba
+MSFT | Microsoft
+TWTR | Twitter
