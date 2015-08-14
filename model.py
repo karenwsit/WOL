@@ -60,14 +60,14 @@ class TwitterHandle(db.Model):
 
 	def __repr__(self):
 		"""Provides helpful representation when printed"""
-		return "<TwitterHandle twitter_handle_id=%s twitter_handle_name=%s twitterhandle_type=%s>" % (self.twitter_handle_id, self.twitter_handle_name, self.twitterhandle_type)
+		return "<TwitterHandle twitterhandle_id=%s twitterhandle_name=%s twitterhandle_type=%s>" % (self.twitterhandle_id, self.twitterhandle_name, self.twitterhandle_type)
 
 class Tweet(db.Model):
 	"""Queried tweets from twitterhandles"""
 
 	__tablename__ = "tweets"
 
-	tweet_id = db.Column(db.Integer, primary_key=True)
+	tweet_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
 	tweet_created_at = db.Column(db.String(32), nullable=False)
 	tweet_txt = db.Column(db.String(150), nullable=False)
 	tweet_url = db.Column(db.String(150))
@@ -82,7 +82,7 @@ class Tweet(db.Model):
 
 	def __repr__(self):
 		"""Provides helpful representation when printed"""
-		return "<Tweet tweet_id=%s tweet_created_at=%s tweet_txt=%s tweet_url=%s stockticker_id=%s twitter_handle_id=%s>" % (self.tweet_id, self.tweet_created_at, self.tweet_txt, self.tweet_url, self.stockticker_id, self.twitterhandle_id)
+		return "<Tweet tweet_id=%s tweet_created_at=%s tweet_txt=%s tweet_url=%s stockticker_id=%s twitterhandle_id=%s>" % (self.tweet_id, self.tweet_created_at, self.tweet_txt, self.tweet_url, self.stockticker_id, self.twitterhandle_id)
 
 class Sentiment(db.Model):
 	"""Sentiment for each day"""
