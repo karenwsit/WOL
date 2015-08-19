@@ -16,6 +16,7 @@ stocks = {
 	'BABA' : 'Alibaba',
 	'MSFT' : 'Microsoft',
 	'TWTR' : 'Twitter',
+	'FB' : 'Facebook',
 }
 
 def load_twitterhandles():
@@ -74,7 +75,7 @@ if __name__ == "__main__":
 	db.create_all()
 
 	load_twitterhandles()
-	load_stocks()
+	# load_stocks()
 	# search_todays_tweets("Google",["wsj"])
 
 

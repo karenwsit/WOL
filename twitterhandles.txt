@@ -1,4 +1,4 @@
-valuewalk, research
+valuewalk, research 
 harvardbiz, research
 seekingalpha, research
 IBDinvestors, research
@@ -26,10 +26,10 @@ PIMCO, market influencer
 AswathDamodaran, market influencer
 Carl_C_Icahn, market influencer
 aJobCreator, market influencer
-@theeconomist, news
-newscientist, news
-mental_floss, news
-huffingtonpost, news
+theeconomist, news
+newscientist, news 
+mental_floss, news 
+huffingtonpost, news 
 bbcworld, news
 foxnews, news
 nytimes, news
@@ -40,7 +40,7 @@ washingtonpost, news
 eonline, news
 telegraphnews, news
 time, news
-wsj, news
+wsj, news 
 usatoday, news
 usabreakingnews, news
 politico, news
