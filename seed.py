@@ -4,6 +4,9 @@
 from model import User, Stock, UserStock, TwitterHandle, Tweet, Sentiment, TweetSentiment, connect_to_db, db
 from server import app
 from datetime import datetime
+import json
+import urllib
+import os
 
 
 stocks = {
@@ -44,39 +47,58 @@ def load_stocks():
 		db.session.add(new_stock)
 
 	db.session.commit()
+kimono_api_ids = {
+	'google': ['2lgdxjpq','awexe96c','9a7rbjs4','9r4xnuiq'],
+	
+}
 
+def load_tweets(api_ids=None):
+	consumer_key=os.environ.get('KIMONO_CONSUMER_KEY')
+	tweet_list = []
 
-# def search_todays_tweets(stock=None, handle_list=None, start_date=None, end_date=None):
-# 	"""Given stock name, return queried tweets from a list of twitter handles for today & save to the database"""
+	for api_id in api_ids:
+		my_results = json.load(urllib.urlopen(
+			"https://www.kimonolabs.com/api/%s?apikey=%s" % (api_id, consumer_key))
+		)
 
-# 	for handle in handle_list:
-# 		query = '%s+from=%s+since=%s+until=%s' % (stock, handle, start_date, end_date)
-# 		search = api.GetSearch(term=query, lang='en')
+		collection1_list = my_results['results']['collection1']
+		stock_ticker = Stock.query.filter_by(stock_name=my_results['name']).first()
+		if stock_ticker:
+			stock_ticker_id = stock_ticker.stock_name
 
-# 		for t in search:		
-# 			tweet_id = t.id
-# 			tweet_created_at = t.created_at
-# 			tweet_txt = t.text
-# 			twitterhandle = TwitterHandle.query.filter_by(username=username).first()
-# 			if twitterhandle:
-# 				twitterhandle_id = twitterhandle.id
-# 			for url in t.urls:
-# 				tweet_url = url.url
+		for i in collection1_list:
+			tweet_created_at = i['timeago']['text']
+			tweet_txt = i['tweet']['text']
+			tweet_url = i['timeago']['href']
+			twitter_handle_dirty = i['twitterhandle']['text']
+			print twitter_handle_dirty
+			twitter_handle_clean = twitter_handle_dirty[twitter_handle_dirty.find('@')+1:]
+			print twitter_handle_clean
+			twitter_handle = TwitterHandle.query.filter_by(twitterhandle_name=twitter_handle_clean).first()
+			print twitter_handle
+			if twitter_handle:
+				twitterhandle_id = twitter_handle.twitterhandle_id
 
-# 		#Adding tweets to my DB
-# 		new_tweet = Tweet(tweet_id=tweet_id, tweet_created_at=tweet_created_at, tweet_txt=tweet_txt,  tweet_url=tweet_url, twitterhandle_id=twitterhandle_id)
-# 		db.session.add(new_tweet)
+		
+			new_tweet = dict(
+				tweet_created_at=tweet_created_at,
+				tweet_txt=tweet_txt,
+				tweet_url=tweet_url,
+				twitterhandle_id=twitterhandle_id,
+				stockticker_id=stock_ticker_id)
+			tweet_list.append(new_tweet)
 
-	# db.session.commit()		
+	db.engine.execute(Tweet.__table__.insert(), tweet_list)
+	db.session.commit()		
 
 
 if __name__ == "__main__":
 	connect_to_db(app)
 	db.create_all()
 
-	load_twitterhandles()
+	# load_twitterhandles()
 	# load_stocks()
-	# search_todays_tweets("Google",["wsj"])
+	load_tweets()
 
 
 

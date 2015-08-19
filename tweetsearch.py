@@ -18,16 +18,7 @@ from server import app
 # auth = OAuthHandler(consumer_key=os.environ.get('TWITTER_CONSUMER_KEY'), consumer_secret=os.environ.get('TWITTER_CONSUMER_SECRET'))
 # auth.set_access_token(os.environ.get('TWITTER_ACCESS_TOKEN'), os.environ.get('TWITTER_ACCESS_TOKEN_SECRET'))
 
-# api = twitter.Api(
-# 		consumer_key='5Roq6Y1bv8Pk5Yb0r8ONwJCaC',
-# 	    consumer_secret='9UQkfBPm8pU7ZQvK3nPa4nVJEhNW3gJfuWft7DN6UhsSDGYHpV',
-# 	    access_token_key='1250836214-rXcorE2Y8KX4RseR0M2gm7LpbsM7pbrl7yKqkrV',
-# 	    access_token_secret='U58GPwr258goyVhm8zD0V7RdB6gdmNEvgttTbaCwIasPk')
 
-# auth = tweepy.OAuthHandler('FxG7pe2CFhTqCP80Qq6VcF04Q', '73U5npmk9e9YzomvlJjroeRCDVHRuDRQ44Y5f8rQHwkVHAbuFm')
-# auth.set_access_token('258376636-RqkrqaCGvYDZX18VCD30KZwI7VDR71bPUCxnfzDA', 'wlcCD9CrQl49nWSlqq64uFOLNCNgB3ociVY4dXCqqihgs')
-
-api = tweepy.API(auth)
 
 def date_range(start,end):
    current = start
