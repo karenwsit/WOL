@@ -47,46 +47,58 @@ def load_stocks():
 		db.session.add(new_stock)
 
 	db.session.commit()
+
 kimono_api_ids = {
-	'google': ['2lgdxjpq','awexe96c','9a7rbjs4','9r4xnuiq'],
-	
+	'Google' : ['2lgdxjpq','awexe96c','9a7rbjs4','9r4xnuiq'],
+	'Tesla' : ['3n9ge4xs'],
+	'Chipotle' : ['6w1fc7gq'],
+	'Disney' : ['awkdxbz6'],
+	'Apple' : ['3b2h1ezc','d61do17k','bglx9jqk','6fmv92pk'],
+	'Nike' : ['5ejpmmty'],
+	'Alibaba' : ['clsw9yzo'],
+	'Microsoft' : ['cdtuqhxu','eacxst54'],
+	'Twitter' : ['bgodnive','8hbdw9vo','1xccxxk6'],
+	'Facebook' : ['8mhmw11c','2bmg3uii', '66jhvw3g']
 }
 
 def load_tweets(api_ids=None):
 	consumer_key=os.environ.get('KIMONO_CONSUMER_KEY')
 	tweet_list = []
 
-	for api_id in api_ids:
-		my_results = json.load(urllib.urlopen(
-			"https://www.kimonolabs.com/api/%s?apikey=%s" % (api_id, consumer_key))
-		)
+	for company_name, api_id_list in kimono_api_ids.iteritems():
 
-		collection1_list = my_results['results']['collection1']
-		stock_ticker = Stock.query.filter_by(stock_name=my_results['name']).first()
-		if stock_ticker:
-			stock_ticker_id = stock_ticker.stock_name
+		for api_id in api_id_list:
+			
+			my_results = json.load(urllib.urlopen(
+				"https://www.kimonolabs.com/api/%s?apikey=%s" % (api_id, consumer_key))
+			)
 
-		for i in collection1_list:
-			tweet_created_at = i['timeago']['text']
-			tweet_txt = i['tweet']['text']
-			tweet_url = i['timeago']['href']
-			twitter_handle_dirty = i['twitterhandle']['text']
-			print twitter_handle_dirty
-			twitter_handle_clean = twitter_handle_dirty[twitter_handle_dirty.find('@')+1:]
-			print twitter_handle_clean
-			twitter_handle = TwitterHandle.query.filter_by(twitterhandle_name=twitter_handle_clean).first()
-			print twitter_handle
-			if twitter_handle:
-				twitterhandle_id = twitter_handle.twitterhandle_id
+			collection1_list = my_results['results']['collection1']
+			stock_ticker = Stock.query.filter_by(stock_name=my_results['name']).first()
+			if stock_ticker:
+				stock_ticker_id = stock_ticker.stock_name
 
-		
-			new_tweet = dict(
-				tweet_created_at=tweet_created_at,
-				tweet_txt=tweet_txt,
-				tweet_url=tweet_url,
-				twitterhandle_id=twitterhandle_id,
-				stockticker_id=stock_ticker_id)
-			tweet_list.append(new_tweet)
+			for i in collection1_list:
+				tweet_created_at = i['timeago']['text']
+				tweet_txt = i['tweet']['text']
+				tweet_url = i['timeago']['href']
+				twitter_handle_dirty = i['twitterhandle']['text']
+				print twitter_handle_dirty
+				twitter_handle_clean = twitter_handle_dirty[twitter_handle_dirty.find('@')+1:]
+				print twitter_handle_clean
+				twitter_handle = TwitterHandle.query.filter_by(twitterhandle_name=twitter_handle_clean).first()
+				print twitter_handle
+				if twitter_handle:
+					twitterhandle_id = twitter_handle.twitterhandle_id
+
+			
+				new_tweet = dict(
+					tweet_created_at=tweet_created_at,
+					tweet_txt=tweet_txt,
+					tweet_url=tweet_url,
+					twitterhandle_id=twitterhandle_id,
+					stockticker_id=stock_ticker_id)
+				tweet_list.append(new_tweet)
 
 	db.engine.execute(Tweet.__table__.insert(), tweet_list)
 	db.session.commit()		
@@ -97,7 +109,7 @@ if __name__ == "__main__":
 	db.create_all()
 
 	# load_twitterhandles()
-	# load_stocks()
+	load_stocks()
 	load_tweets()
 
 
