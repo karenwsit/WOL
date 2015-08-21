@@ -1,12 +1,12 @@
 """Utility file to seed database from twitter api"""
 
-
 from model import User, Stock, UserStock, TwitterHandle, Tweet, Sentiment, TweetSentiment, connect_to_db, db
 from server import app
 from datetime import datetime
 import json
 import urllib
 import os
+import re
 
 
 stocks = {
@@ -44,7 +44,7 @@ def load_stocks():
 		stock_name = stocks[stockticker_id]
 		
 		new_stock = Stock(stockticker_id=stockticker_id, stock_name=stock_name)
-		db.session.add(new_stock)
+		db.session.merge(new_stock)
 
 	db.session.commit()
 
@@ -66,9 +66,8 @@ def load_tweets(api_ids=None):
 	tweet_list = []
 
 	for company_name, api_id_list in kimono_api_ids.iteritems():
-
 		for api_id in api_id_list:
-			
+
 			my_results = json.load(urllib.urlopen(
 				"https://www.kimonolabs.com/api/%s?apikey=%s" % (api_id, consumer_key))
 			)
@@ -80,21 +79,21 @@ def load_tweets(api_ids=None):
 
 			for i in collection1_list:
 				tweet_created_at = i['timeago']['text']
-				tweet_txt = i['tweet']['text']
+				raw_tweet_text = i['tweet']['text']
+				clean_tweet_text1 = re.sub(r"http\S+", "", raw_tweet_text)
+				clean_tweet_text = re.sub(r"@\S+", "", clean_tweet_text1).replace('"','').replace(',','').replace('.','').strip()
 				tweet_url = i['timeago']['href']
 				twitter_handle_dirty = i['twitterhandle']['text']
-				print twitter_handle_dirty
 				twitter_handle_clean = twitter_handle_dirty[twitter_handle_dirty.find('@')+1:]
-				print twitter_handle_clean
 				twitter_handle = TwitterHandle.query.filter_by(twitterhandle_name=twitter_handle_clean).first()
-				print twitter_handle
 				if twitter_handle:
 					twitterhandle_id = twitter_handle.twitterhandle_id
 
 			
 				new_tweet = dict(
 					tweet_created_at=tweet_created_at,
-					tweet_txt=tweet_txt,
+					raw_tweet_text=raw_tweet_text,
+					clean_tweet_text=clean_tweet_text,
 					tweet_url=tweet_url,
 					twitterhandle_id=twitterhandle_id,
 					stockticker_id=stock_ticker_id)

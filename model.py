@@ -5,8 +5,6 @@ from datetime import datetime
 
 db = SQLAlchemy()
 
-#Model definitions 
-
 class User(db.Model):
 	"""User of WOL website."""
 
@@ -69,7 +67,8 @@ class Tweet(db.Model):
 
 	tweet_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
 	tweet_created_at = db.Column(db.String(32), nullable=False)
-	tweet_txt = db.Column(db.String(150), nullable=False)
+	raw_tweet_text = db.Column(db.String(150), nullable=False)
+	clean_tweet_text = db.Column(db.String(150), nullable=True)
 	tweet_url = db.Column(db.String(150))
 	stockticker_id = db.Column(db.String(10), db.ForeignKey('stocks.stockticker_id'))
 	twitterhandle_id = db.Column(db.Integer, db.ForeignKey('twitterhandles.twitterhandle_id'))
@@ -82,7 +81,7 @@ class Tweet(db.Model):
 
 	def __repr__(self):
 		"""Provides helpful representation when printed"""
-		return "<Tweet tweet_id=%s tweet_created_at=%s tweet_txt=%s tweet_url=%s stockticker_id=%s twitterhandle_id=%s>" % (self.tweet_id, self.tweet_created_at, self.tweet_txt, self.tweet_url, self.stockticker_id, self.twitterhandle_id)
+		return "<Tweet tweet_id=%s tweet_created_at=%s raw_tweet_text=%s clean_tweet_text=%s tweet_url=%s stockticker_id=%s twitterhandle_id=%s>" % (self.tweet_id, self.tweet_created_at, self.raw_tweet_text, self.clean_tweet_text, self.tweet_url, self.stockticker_id, self.twitterhandle_id)
 
 class Sentiment(db.Model):
 	"""Sentiment for each day"""
