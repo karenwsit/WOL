@@ -11,6 +11,7 @@ stocks = {
 	'BABA' : 'Alibaba',
 	'MSFT' : 'Microsoft',
 	'TWTR' : 'Twitter',
+	'FB' : 'Facebook'
 }
 
 #looping through stocks list & calling the Yahoo Finance API 

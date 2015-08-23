@@ -66,7 +66,7 @@ class Tweet(db.Model):
 	__tablename__ = "tweets"
 
 	tweet_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
-	tweet_created_at = db.Column(db.String(32), nullable=False)
+	tweet_created_at = db.Column(db.DateTime, nullable=False)
 	raw_tweet_text = db.Column(db.String(150), nullable=False)
 	clean_tweet_text = db.Column(db.String(150), nullable=True)
 	tweet_url = db.Column(db.String(150))
@@ -89,8 +89,7 @@ class Sentiment(db.Model):
 	__tablename__ = "sentiments"
 
 	sentiment_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
-	start_date = db.Column(db.DateTime)
-	end_date = db.Column(db.DateTime)
+	date = db.Column(db.DateTime, db.ForeignKey('tweets.tweet_created_at'))
 	sentiment = db.Column(db.Boolean, nullable=False)
 	likelihood_probability = db.Column(db.Float, nullable=False)
 

@@ -5,6 +5,8 @@ import nltk.classify.util
 import re
 import csv
 import random
+from model import User, Stock, UserStock, TwitterHandle, Tweet, Sentiment, TweetSentiment, connect_to_db, db
+from server import app
 
 """
 Training & Testing NaiveBayesClassifier
@@ -48,21 +50,21 @@ def extract_features(document):
 		features['contains(%s)' % word] = (word in document_words)
 	return features
 
+def train_classifier():
+	training_set = nltk.classify.apply_features(extract_features, training_tweets) 
+	test_set = nltk.classify.apply_features(extract_features, test_tweets)
+	global classifier
+	classifier = nltk.NaiveBayesClassifier.train(training_set)
+	return classifier 
 
 if __name__ == "__main__":
 	raw_training_tweets = read_file()
 	training_tweets = clean_tweets(raw_training_tweets)
-	print training_tweets
-	print "***************************************************************"
 
 	# split cleaned tweet list into test and training
 	# small_training_tweets = random.sample(range(len(training_tweets)), .75*len(training_tweets))
 	# small_test_tweets = int(len(tweet_list) * 0.75)
-
-	training_set = nltk.classify.apply_features(extract_features, training_tweets) 
-	test_set = nltk.classify.apply_features(extract_features, test_tweets)
-
-	classifier = nltk.NaiveBayesClassifier.train(training_set)
+	train_classifier()
 
 	# print 'accuracy:', nltk.classify.accuracy(classifier, test_set)
 	# print classifier.show_most_informative_features()
@@ -71,10 +73,5 @@ if __name__ == "__main__":
 # dist = classifier.prob_classify(features)
 # for label in dist.samples():
 #     print("%s: %f" % (label, dist.prob(label)))
-
-# classifier.classify(extract_features(tweet.split()))
-# classifier_object = classifier.prob_classify(extract_features(tweet.split()))
-# classifier_object.logprob('positive')
-# classified_object.logprob('negative')
 
 # print 'precision:', nltk.metrics

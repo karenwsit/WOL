@@ -3,6 +3,7 @@
 from model import User, Stock, UserStock, TwitterHandle, Tweet, Sentiment, TweetSentiment, connect_to_db, db
 from server import app
 from datetime import datetime
+import classifer
 import json
 import urllib
 import os
@@ -78,13 +79,17 @@ def load_tweets(api_ids=None):
 				stock_ticker_id = stock_ticker.stock_name
 
 			for i in collection1_list:
-				tweet_created_at = i['timeago']['text']
+				timestamp = i['timeago']['data-timestamp']
+				tweet_created_at = datetime.fromtimestamp(int(timestamp))
 				raw_tweet_text = i['tweet']['text']
 				clean_tweet_text1 = re.sub(r"http\S+", "", raw_tweet_text)
 				clean_tweet_text = re.sub(r"@\S+", "", clean_tweet_text1).replace('"','').replace(',','').replace('.','').strip()
 				tweet_url = i['timeago']['href']
 				twitter_handle_dirty = i['twitterhandle']['text']
 				twitter_handle_clean = twitter_handle_dirty[twitter_handle_dirty.find('@')+1:]
+				stock = Stock.query.filter_by(stock_name=company_name).first()
+				if stock:
+					stockticker_id = stock.stockticker_id
 				twitter_handle = TwitterHandle.query.filter_by(twitterhandle_name=twitter_handle_clean).first()
 				if twitter_handle:
 					twitterhandle_id = twitter_handle.twitterhandle_id
@@ -102,14 +107,43 @@ def load_tweets(api_ids=None):
 	db.engine.execute(Tweet.__table__.insert(), tweet_list)
 	db.session.commit()		
 
+def load_sentiments():
+	
+	sentiment_list = []
+	train_classifier.init()
+	tweets = Tweet.query.all()
+
+	for tweet in tweets:
+		date = tweet.tweet_created_at
+		sentiment = classifier.classify(extract_features(tweet.split()))
+		classifier_object = classifer.classifier.prob_classify(extract_features(tweet.split()))
+		likelihood_probability = classifier_object.logprob(sentiment)
+
+		print date
+		print sentiment
+		print likelihood_probability
+		
+		new_sentiment = dict(
+			sentiment=sentiment, 
+			date=date, 
+			likelihood_probability=likelihood_probability)
+		sentiment_list.append(new_sentiment)
+
+	return
+
+
+	# db.session.execute(Sentiment.__table__.insert(), sentiment_list)
+	# db.session.commit()
 
 if __name__ == "__main__":
 	connect_to_db(app)
+	# db.drop_all()
 	db.create_all()
 
 	# load_twitterhandles()
-	load_stocks()
-	load_tweets()
+	# load_stocks()
+	# load_tweets()
+	load_sentiments()
 
 
 
