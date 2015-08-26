@@ -28,6 +28,20 @@ class Stock(db.Model):
 		"""Provides helpful representation when printed"""
 		return "<Stock stockticker_id=%s stock_name=%s>" % (self.stockticker_id, self.stock_name)
 
+class StockPrice(db.Model):
+	"""Stock Prices on WOL website."""
+
+	__tablename__ = "stockprices"
+
+	stockprice_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
+	stockticker_id = db.Column(db.String(10), db.ForeignKey('stocks.stockticker_id'))
+	date = db.Column(db.DateTime, nullable = False)
+	stock_price = db.Column(db.Integer, nullable = False)
+
+	def __repr__(self):
+		"""Provides helpful representation when printed"""
+		return "<StockPrice stockprice_id=%s stockticker_id=%s date=%s stock_price=%s>" % (self.stockprice_id, self.stockticker_id, self.date, self.stock_price)
+
 class UserStock(db.Model):
 	"""Reference table for User and Stock"""
 
@@ -35,7 +49,7 @@ class UserStock(db.Model):
 
 	userstock_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
 	user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'))
-	stocticker_id = db.Column(db.String(10), db.ForeignKey('stocks.stockticker_id'))	
+	stockticker_id = db.Column(db.String(10), db.ForeignKey('stocks.stockticker_id'))	
 
 	#Define relationship to user
 	user = db.relationship("User", backref=db.backref("userstocks", order_by=userstock_id))
@@ -72,6 +86,8 @@ class Tweet(db.Model):
 	tweet_url = db.Column(db.String(150))
 	stockticker_id = db.Column(db.String(10), db.ForeignKey('stocks.stockticker_id'))
 	twitterhandle_id = db.Column(db.Integer, db.ForeignKey('twitterhandles.twitterhandle_id'))
+	sentiment = db.Column(db.String(32))
+	likelihood_probability = db.Column(db.Float)
 
 	#Define relationship to stock
 	stock = db.relationship("Stock", backref=db.backref("tweets", order_by=tweet_id))
@@ -84,37 +100,15 @@ class Tweet(db.Model):
 		return "<Tweet tweet_id=%s tweet_created_at=%s raw_tweet_text=%s clean_tweet_text=%s tweet_url=%s stockticker_id=%s twitterhandle_id=%s>" % (self.tweet_id, self.tweet_created_at, self.raw_tweet_text, self.clean_tweet_text, self.tweet_url, self.stockticker_id, self.twitterhandle_id)
 
 class Sentiment(db.Model):
-	"""Sentiment for each day"""
+	"""Positive and Negative Sentiment for Referential Integrity"""
 
 	__tablename__ = "sentiments"
 
-	sentiment_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
-	date = db.Column(db.DateTime, db.ForeignKey('tweets.tweet_created_at'))
-	sentiment = db.Column(db.Boolean, nullable=False)
-	likelihood_probability = db.Column(db.Float, nullable=False)
+	sentiment = db.Column(db.String(32), primary_key=True)
 
 	def __repr__(self):
 		"""Provides helpful representation when printed"""
-		return "<Sentiment sentiment_id=%s start_date=%s end_date=%s sentiment=%s likelihood_probability=%s>" % (self.sentiment_id, self.start_date, self.end_date, self.sentiment, self.likelihood_probability)
-
-class TweetSentiment(db.Model):
-	"""Reference table for Tweet and Sentiment"""
-
-	__tablename__ = "tweetsentiments"
-
-	tweetsentiment_id = db.Column(db.Integer, primary_key=True)
-	tweet_id = db.Column(db.Integer, db.ForeignKey('tweets.tweet_id'))
-	sentiment_id = db.Column(db.Integer, db.ForeignKey('sentiments.sentiment_id'))
-
-	#Define relaionship to tweet
-	tweet = db.relationship("Tweet", backref=db.backref("tweetsentiments", order_by=tweetsentiment_id))
-
-	#Define relaionship to sentiment
-	sentiment = db.relationship("Sentiment", backref=db.backref("tweetsentiments", order_by=tweetsentiment_id))
-
-	def __repr__(self):
-		"""Provides helpful representation when printed"""
-		return "<TweetSentiment tweetsentiment_id=%s tweet_id=%s sentiment_id=%s>" % (self.tweetsentiment_id, self.tweet_id, self.sentiment_id)
+		return "<Sentiment sentiment=%s>" % (self.sentiment) 
 
 ##########################################################################
 

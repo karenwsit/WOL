@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<link rel="stylesheet" type="text/css" href="/static/jquery.dataTables.min.css" />
+
+	<title> WOL </title>
+</head>
+<body>
+	<h1> WOL Analysis </h1>
+	<form method="get">
+		<input type="text" name="startDate" placeholder="start date" />
+		<input type="text" name="endDate" placeholder="end date" />
+		<button>Submit</button>
+	</form>
+	<table id="analysis-table">
+		<thead>
+			<tr>
+				<th> Stock </th>
+				<th> Sentiment </th>
+				<th> Probability </th>
+				<th> Current Stock Price </th>
+			</tr>
+		</thead>
+		<tbody>
+			<!-- <tr>
+				<td> {{ Tesla }} </td>
+				<td> {{ Chipotle }} </td>
+				<td> {{ Disney }} </td>
+				<td> {{ Apple }} </td>
+				<td> {{ Nike }} </td>
+				<td> {{ Alibaba }} </td>
+				<td> {{ Microsoft }} </td>
+				<td> {{ Twitter }} </td>
+				<td> {{ Facebook }} </td>
+			</tr> -->
+		</tbody>
+	</table>
+	
+	<script src="/static/jquery-1.11.3.min.js"></script>
+	<script src="/static/jquery.dataTables.min.js"></script>
+	<script src="/static/main.js"></script>
+</body>
+</html>
+
+

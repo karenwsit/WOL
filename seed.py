@@ -1,13 +1,15 @@
 """Utility file to seed database from twitter api"""
 
-from model import User, Stock, UserStock, TwitterHandle, Tweet, Sentiment, TweetSentiment, connect_to_db, db
+from model import User, Stock, UserStock, TwitterHandle, Tweet, Sentiment, connect_to_db, db, StockPrice
 from server import app
 from datetime import datetime
 import classifer
-import json
-import urllib
 import os
 import re
+import decimal
+from urllib2 import Request, urlopen 
+import urllib, json
+from StringIO import StringIO
 
 
 stocks = {
@@ -67,7 +69,9 @@ def load_tweets(api_ids=None):
 	tweet_list = []
 
 	for company_name, api_id_list in kimono_api_ids.iteritems():
+		print company_name
 		for api_id in api_id_list:
+			print api_id
 
 			my_results = json.load(urllib.urlopen(
 				"https://www.kimonolabs.com/api/%s?apikey=%s" % (api_id, consumer_key))
@@ -85,6 +89,14 @@ def load_tweets(api_ids=None):
 				clean_tweet_text1 = re.sub(r"http\S+", "", raw_tweet_text)
 				clean_tweet_text = re.sub(r"@\S+", "", clean_tweet_text1).replace('"','').replace(',','').replace('.','').strip()
 				tweet_url = i['timeago']['href']
+
+				#sentiment analysis on each tweet
+				# tweet_classifier = classifer.get_trained_classifier()
+				# sentiment = tweet_classifier.classify(classifer.extract_features(clean_tweet_text.split()))
+				# classifier_object = tweet_classifier.prob_classify(classifer.extract_features(clean_tweet_text.split()))
+				# log_prob = classifier_object.logprob('positive')
+				# likelihood_probability = decimal.Decimal(pow(2,log_prob))
+
 				twitter_handle_dirty = i['twitterhandle']['text']
 				twitter_handle_clean = twitter_handle_dirty[twitter_handle_dirty.find('@')+1:]
 				stock = Stock.query.filter_by(stock_name=company_name).first()
@@ -105,45 +117,86 @@ def load_tweets(api_ids=None):
 				tweet_list.append(new_tweet)
 
 	db.engine.execute(Tweet.__table__.insert(), tweet_list)
-	db.session.commit()		
+	db.session.commit()	
 
-def load_sentiments():
-	
-	sentiment_list = []
-	train_classifier.init()
+
+def load_sentiments_into_tweettable():
+	tweet_classifier = classifer.get_trained_classifier()
 	tweets = Tweet.query.all()
 
 	for tweet in tweets:
-		date = tweet.tweet_created_at
-		sentiment = classifier.classify(extract_features(tweet.split()))
-		classifier_object = classifer.classifier.prob_classify(extract_features(tweet.split()))
-		likelihood_probability = classifier_object.logprob(sentiment)
-
-		print date
+		sentiment = tweet_classifier.classify(classifer.extract_features(tweet.clean_tweet_text.split()))
 		print sentiment
+		classifier_object = tweet_classifier.prob_classify(classifer.extract_features(tweet.clean_tweet_text.split()))
+		log_prob = classifier_object.logprob('positive')
+		likelihood_probability = decimal.Decimal(pow(2,log_prob))
 		print likelihood_probability
-		
-		new_sentiment = dict(
-			sentiment=sentiment, 
-			date=date, 
-			likelihood_probability=likelihood_probability)
-		sentiment_list.append(new_sentiment)
+		tweet.sentiment = sentiment
+		tweet.likelihood_probability = likelihood_probability
 
-	return
+	db.session.commit()
 
 
-	# db.session.execute(Sentiment.__table__.insert(), sentiment_list)
-	# db.session.commit()
+def load_sentiments():
+	
+	# tweet_classifier = classifer.get_trained_classifier()
+	# tweets = Tweet.query.all()
+
+	# for tweet in tweets:
+	# 	date = tweet.tweet_created_at
+	# 	sentiment = tweet_classifier.classify(classifer.extract_features(tweet.clean_tweet_text.split()))
+	# 	classifier_object = tweet_classifier.prob_classify(classifer.extract_features(tweet.clean_tweet_text.split()))
+	# 	log_prob = classifier_object.logprob('positive')
+	# 	likelihood_probability = decimal.Decimal(pow(2,log_prob))
+
+	new_sentiment1 = Sentiment(sentiment='positive')
+	new_sentiment2 = Sentiment(sentiment='negative')
+
+	db.session.add(new_sentiment1)
+	db.session.add(new_sentiment2)	
+	db.session.commit()
+
+def load_stockprices():	
+
+	for key in stocks:
+		stock_ticker = key
+
+		yql_url = """https://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20yahoo.finance.historicaldata%20where%20symbol%20%3D%20%22"""+stock_ticker+"""%22%20and%20startDate%20%3D%20%222015-07-17%22%20and%20endDate%20%3D%20%222015-08-17%22&format=json&diagnostics=true&env=store%3A%2F%2Fdatatables.org%2Falltableswithkeys&callback="""
+
+		req = Request(yql_url)
+		result_str = urlopen(req)
+
+		data = json.loads(result_str.read())
+
+		stock_dict = data['query']['results']
+		stock_dict_value = stock_dict['quote']
+
+		for i in range(len(stock_dict_value)):
+			stock_date_string = stock_dict_value[i]['Date']
+			stock_date = datetime.strptime(stock_date_string, "%Y-%m-%d")
+			stock_ticker = stock_dict_value[i]['Symbol']
+			stock_close = stock_dict_value[i]['Close']
+
+			new_stockprice = StockPrice(
+				stockticker_id =stock_ticker,
+				date=stock_date,
+				stock_price=stock_close)
+
+			db.session.add(new_stockprice)
+		db.session.commit()
+
 
 if __name__ == "__main__":
 	connect_to_db(app)
-	# db.drop_all()
+	# # db.drop_all()
 	db.create_all()
 
 	# load_twitterhandles()
 	# load_stocks()
 	# load_tweets()
-	load_sentiments()
+	# load_sentiments()
+	# load_stockprices()
+	load_sentiments_into_tweettable()
 
 
 

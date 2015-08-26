@@ -5,7 +5,7 @@ import nltk.classify.util
 import re
 import csv
 import random
-from model import User, Stock, UserStock, TwitterHandle, Tweet, Sentiment, TweetSentiment, connect_to_db, db
+from model import User, Stock, UserStock, TwitterHandle, Tweet, Sentiment, connect_to_db, db
 from server import app
 
 """
@@ -22,7 +22,7 @@ test_tweets = [
 
 
 def read_file():
-    with open('small_training.csv', 'r') as f:
+    with open('training.1600000.processed.noemoticon.csv', 'r') as f:
     	tweet_list = []
         for row in csv.reader(f.read().splitlines()):
 	    	tweet = row[5] 
@@ -50,28 +50,32 @@ def extract_features(document):
 		features['contains(%s)' % word] = (word in document_words)
 	return features
 
-def train_classifier():
-	training_set = nltk.classify.apply_features(extract_features, training_tweets) 
-	test_set = nltk.classify.apply_features(extract_features, test_tweets)
-	global classifier
-	classifier = nltk.NaiveBayesClassifier.train(training_set)
-	return classifier 
-
-if __name__ == "__main__":
+def get_trained_classifier():
 	raw_training_tweets = read_file()
 	training_tweets = clean_tweets(raw_training_tweets)
+	training_set = nltk.classify.apply_features(extract_features, training_tweets) 
+	# test_set = nltk.classify.apply_features(extract_features, test_tweets)
+	# global classifier
+	classifier = nltk.NaiveBayesClassifier.train(training_set)
+	return classifier 
+	# return "hi"
+
+#def classifier():
+#	return make_classifier().classify(extract_features(tweet.split()))
+	
+
+if __name__ == "__main__":
+	get_trained_classifier()
 
 	# split cleaned tweet list into test and training
 	# small_training_tweets = random.sample(range(len(training_tweets)), .75*len(training_tweets))
 	# small_test_tweets = int(len(tweet_list) * 0.75)
-	train_classifier()
+	# train_classifier()
 
 	# print 'accuracy:', nltk.classify.accuracy(classifier, test_set)
 	# print classifier.show_most_informative_features()
+	# dist = classifier.prob_classify(features)
+	# for label in dist.samples():
+	#     print("%s: %f" % (label, dist.prob(label)))
 
-
-# dist = classifier.prob_classify(features)
-# for label in dist.samples():
-#     print("%s: %f" % (label, dist.prob(label)))
-
-# print 'precision:', nltk.metrics
+	# print 'precision:', nltk.metrics

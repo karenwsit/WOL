@@ -1,27 +1,14 @@
-from flask import Flask, render_template
-import datetime 
+from flask import Flask, render_template, jsonify, send_from_directory
+from model import User, Stock, UserStock, TwitterHandle, Tweet, Sentiment, connect_to_db, db, StockPrice
+import datetime
 import urllib2, urllib, json
+from urllib2 import Request, urlopen 
+from sqlalchemy.sql import func
+import numpy
 
-app = Flask(__name__)
+app = Flask(__name__, static_url_path='')
 
-
-@app.route("/")
-def index():
-
-	"""Loads main page"""
-
-	return render_template("index.html")
-
-@app.route("/stockprice")
-def stockprice():
-
-	today_datetime = datetime.datetime.now()
-	end_date = today_datetime.strftime('%Y-%m-%d')
-
-	yesterday_datetime = datetime.datetime.now() - datetime.timedelta(hours=24)
-	start_date = yesterday_datetime.strftime('%Y-%m-%d')
-
-	stocks = {
+stocks = {
 	'GOOG' : 'Google',
 	'TSLA' : 'Tesla',
 	'CMG' : 'Chipotle',
@@ -33,23 +20,82 @@ def stockprice():
 	'TWTR' : 'Twitter',
 	'FB' : 'Facebook'
 	}
+DATE_FORMAT = '%Y-%m-%d'
 
-	stocks.jsonify
+@app.route("/")
+def index():
 
-	# for key in stocks:
-	stock_ticker = 'FB'
+	"""Loads main page"""
 
-	yql_url = "https://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20yahoo.finance.historicaldata%20where%20symbol%20%3D%20%27"+stock_ticker+"%27%20and%20startDate%20%3D%20%27"+start_date+"%27%20and%20endDate%20%3D%20%27"+end_date+"%27&format=json&diagnostics=true&env=store%3A%2F%2Fdatatables.org%2Falltableswithkeys&callback="" """ 
-	result = urllib2.urlopen(yql_url).read()
-	data = json.loads(result)
+	return render_template('index.html')
 
-	# stock_dict = data['query']['results']
 
-	# stock_date = stock_dict['quote']['Date']
-	# stock_ticker = stock_dict['quote']['Symbol']
-	# stock_close = stock_dict['quote']['Close']
-	
+@app.route("/static/<path:file_name>")
+def static_files(file_name):
+
+	return send_from_directory('static', file_name)
+
+
+@app.route("/json")
+def make_json_object():
+	main_list = []
+	start_date = datetime.datetime.strptime('2015-07-19',(DATE_FORMAT))
+	end_date = datetime.datetime.strptime('2015-08-21',(DATE_FORMAT))
+	day_count = (end_date - start_date).days + 1
+
+	for ticker, name in stocks.iteritems():
+		ticker_dict = {
+			'name': name,
+			'dates': {}
+		} 
+
+		date_dict = ticker_dict['dates']
+		#import pprint; pprint.pprint(ticker_dict)
+		for single_date in (start_date + datetime.timedelta(n) for n in range(day_count)): 
+			first_date = single_date.strftime(DATE_FORMAT)
+			second_date = (single_date + datetime.timedelta(1)).strftime(DATE_FORMAT)
+			tweets = db.session.query(Tweet).filter(Tweet.tweet_created_at.between(first_date, second_date)).filter_by(stockticker_id=name).all()
+			if len(tweets) != 0:
+				date_dict[first_date] = {
+					'probability_avg': numpy.mean([tweet.likelihood_probability for tweet in tweets]),
+					'probability_median' : numpy.median([tweet.likelihood_probability for tweet in tweets]),
+					'standard_dev' : numpy.std([tweet.likelihood_probability for tweet in tweets]),
+					'tweets': [{'text': tweet.raw_tweet_text,'url' : tweet.tweet_url} for tweet in tweets]
+				}
+
+		main_list.append(ticker_dict)
+
+	json_object = jsonify({'data': main_list})	
+	return json_object
+
+@app.route("/stockprice")
+@app.route("/stockprice/<stock_ticker>")
+def stockprice(stock_ticker=None):
+
+	current_price_dict = {}
+	stockprice_url_template = 'http://finance.yahoo.com/webservice/v1/symbols/{0}/quote?format=json'
+
+	def get_stockdata(stock):
+		stockprice_url = stockprice_url_template.format(stock)
+
+		req = Request(stockprice_url)
+		result_str = urlopen(req)
+		data = json.loads(result_str.read())
+		print data
+		all_current_prices = current_price_dict[stock] = data['list']['resources'][0]['resource']['fields']['price']
+		print all_current_prices
+
+	if stock_ticker is None:
+		for key in stocks:
+			get_stockdata(key)			
+	else: 
+		get_stockdata(stock_ticker)
+
+	json_object = jsonify(current_price_dict)
+	return json_object
 
 
 if __name__ == "__main__":
+	connect_to_db(app)
 	app.run(debug=True)
+
