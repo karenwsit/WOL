@@ -1,4 +1,4 @@
-from flask import Flask, render_template, jsonify, send_from_directory
+from flask import Flask, render_template, jsonify, send_from_directory, request
 from model import User, Stock, UserStock, TwitterHandle, Tweet, Sentiment, connect_to_db, db, StockPrice
 import datetime
 import urllib2, urllib, json
@@ -15,12 +15,14 @@ stocks = {
 	'DIS' : 'Disney',
 	'AAPL' : 'Apple',
 	'NKE' : 'Nike',
-	'BABA' : 'Alibaba',
+	'BABA' : 'Alibaba', 
 	'MSFT' : 'Microsoft',
 	'TWTR' : 'Twitter',
 	'FB' : 'Facebook'
 	}
 DATE_FORMAT = '%Y-%m-%d'
+POSITIVE = 'Hell Yeah'
+NEGATIVE = 'BRB Crying'
 
 @app.route("/")
 def index():
@@ -39,19 +41,27 @@ def static_files(file_name):
 @app.route("/json")
 def make_json_object():
 	main_list = []
-	start_date = datetime.datetime.strptime('2015-07-19',(DATE_FORMAT))
-	end_date = datetime.datetime.strptime('2015-08-21',(DATE_FORMAT))
+	start = request.args.get("startDate")
+	end = request.args.get("endDate")
+
+	start_date = datetime.datetime.strptime(start,(DATE_FORMAT))
+	end_date = datetime.datetime.strptime(end,(DATE_FORMAT))
 	day_count = (end_date - start_date).days + 1
+	print start_date, end_date
 
 	for ticker, name in stocks.iteritems():
 		ticker_dict = {
 			'name': name,
-			'dates': {}
+			'dates': {},
+			'current_stock_price' : get_stockprice(ticker)
 		} 
 
 		date_dict = ticker_dict['dates']
 		#import pprint; pprint.pprint(ticker_dict)
+		##create an array
+		probability_list = []
 		for single_date in (start_date + datetime.timedelta(n) for n in range(day_count)): 
+			print single_date
 			first_date = single_date.strftime(DATE_FORMAT)
 			second_date = (single_date + datetime.timedelta(1)).strftime(DATE_FORMAT)
 			tweets = db.session.query(Tweet).filter(Tweet.tweet_created_at.between(first_date, second_date)).filter_by(stockticker_id=name).all()
@@ -62,37 +72,28 @@ def make_json_object():
 					'standard_dev' : numpy.std([tweet.likelihood_probability for tweet in tweets]),
 					'tweets': [{'text': tweet.raw_tweet_text,'url' : tweet.tweet_url} for tweet in tweets]
 				}
+				probability_list.append(date_dict[first_date]['probability_avg'])
+
+		ticker_dict['overall_prob'] = numpy.mean(probability_list)
+		ticker_dict['overall_sentiment'] = POSITIVE if ticker_dict['overall_prob'] >= .5 else NEGATIVE
 
 		main_list.append(ticker_dict)
 
-	json_object = jsonify({'data': main_list})	
+	json_object = jsonify({'data': main_list})
+
 	return json_object
 
-@app.route("/stockprice")
-@app.route("/stockprice/<stock_ticker>")
-def stockprice(stock_ticker=None):
 
-	current_price_dict = {}
+def get_stockprice(stock_ticker=None):
+
 	stockprice_url_template = 'http://finance.yahoo.com/webservice/v1/symbols/{0}/quote?format=json'
+	stockprice_url = stockprice_url_template.format(stock_ticker)
 
-	def get_stockdata(stock):
-		stockprice_url = stockprice_url_template.format(stock)
+	req = Request(stockprice_url)
+	result_str = urlopen(req)
+	data = json.loads(result_str.read())
 
-		req = Request(stockprice_url)
-		result_str = urlopen(req)
-		data = json.loads(result_str.read())
-		print data
-		all_current_prices = current_price_dict[stock] = data['list']['resources'][0]['resource']['fields']['price']
-		print all_current_prices
-
-	if stock_ticker is None:
-		for key in stocks:
-			get_stockdata(key)			
-	else: 
-		get_stockdata(stock_ticker)
-
-	json_object = jsonify(current_price_dict)
-	return json_object
+	return data['list']['resources'][0]['resource']['fields']['price']
 
 
 if __name__ == "__main__":
