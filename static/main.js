@@ -11,6 +11,7 @@ $(function () {
 	// console.log(url)
 
 	loadChartData(url);
+	loadStockPriceChartData(url);
 
 	$('#analysis-table').dataTable({
 		ajax: url,
@@ -19,13 +20,69 @@ $(function () {
 			{ data: 'overall_sentiment'},
 			{ data: 'overall_prob'},
 			{ data: 'current_stock_price'}
-		]
+		],
+		createdRow: function (row) {
+			$(row).addClass('stock-row');
+		}
 	});
 
+	var apiTable = new $.fn.dataTable.Api( '#analysis-table' );
 	//make ajax call to call the json object in /json route. It will return the json object into the function as the data argument
 	$.get(url, function (data) {
 		// console.log('data: ', data);
 	});
+
+	$('tbody').on('click', '.stock-row', function(){
+		var tr = $(this);
+        var row = apiTable.row(tr);
+ 
+        if ( row.child.isShown() ) {
+            // This row is already open - close it
+            row.child.hide();
+            tr.removeClass('shown');
+        }
+        else {
+            // Open this row
+            row.child( createChildTable(row.data()) ).show();
+            tr.addClass('shown');
+        }
+	});
+
+	function createChildTable (data) {
+		var dateTable = $('<table class="child-table">' +
+			'<thead><tr>'+
+				'<th>Date</th>' +
+				'<th>Tweet</th>' +
+			'</tr></thead>' +
+			'<tbody></tbody></table>');
+
+		var $tbody = dateTable.find('tbody');
+		for (var dateKey in data.dates) {
+			var dateObj = data.dates[dateKey];
+			var $dateRow = $('<tr>');
+			var $tweetCell = $('<td>');
+
+			$tbody.append($dateRow);
+			
+			$dateRow.append($('<td>').text(dateKey));
+			$dateRow.append($tweetCell);
+
+			for (var i = 0; i < dateObj['tweets'].length; i++){
+				var tweetObj = dateObj['tweets'][i]
+				var $tweetLink = $('<a>');
+				$tweetLink.text(tweetObj.text);
+				$tweetLink.attr({
+					class: 'tweet-link',
+					href: tweetObj.url,
+					target: '_blank'
+				});
+
+				$tweetCell.append($tweetLink);
+			}
+		}
+
+		return dateTable;
+	}
 });
 
 //loads SentimentChartData
@@ -35,21 +92,11 @@ function loadChartData(url) {
 		var dates = jsondata['data'][0]['dates'],
 			 datesArray = Object.keys(dates);
 
-		// for (var i = 0, len = jsondata['data'].length; i < len; i++) {
-		// 	var cachedDates = jsondata['data'][i]['dates'];
-		// 	var probArray = [];
-
-		// 	for (var dateKey in cachedDates) {
-		// 		var probs = cachedDates[dateKey]['probability_avg']
-		// 		probArray.push(probs);		
-		// 	}
-		// 	// console.log(probArray);	
-		// }
 		var scatterData = [];
 		var strokeColor = ['#F16220','#F99E15', '#DA6E12', '#DA4321', '#F91A15', '#F9244F', '#DA20A3', '#DB2FF1', '#9220DA', '#6D24F9'];
 		
-		jsondata.data = Array(jsondata['data'][0]);
-		debugger;
+		// jsondata.data = Array(jsondata['data'][0]);
+
 		for (var i=0; i < jsondata['data'].length; i++){
 			// for each stock, make a data obj
 			var stockObj = jsondata['data'][i];
@@ -76,123 +123,20 @@ function loadChartData(url) {
 		}
 
 		var sentiments = document.getElementById('sentimentchart').getContext('2d');
-    	
-//     	var data = {
-//     		labels: datesArray,
-//     		datasets: [
-// 	    		{
-// 	    			label: "Alibaba",
-// 	            	fillColor: "rgba(220,220,220,0.2)",
-// 	            	strokeColor: "rgba(220,220,220,1)",
-// 	            	pointColor: "rgba(220,220,220,1)",
-// 	            	pointStrokeColor: "#fff",
-// 	            	pointHighlightFill: "#fff",
-// 	            	pointHighlightStroke: "rgba(220,220,220,1)",
-// 	            	data: [65, "", "", 59, "", 80, 1, 72, "", 100, "", 95]
-//             	},
-//             	{
-// 		            label: "Apple",
-// 		            fillColor: "rgba(151,187,205,0.2)",
-// 		            strokeColor: "rgba(151,187,205,1)",
-// 		            pointColor: "rgba(151,187,205,1)",
-// 		            pointStrokeColor: "#fff",
-// 		            pointHighlightFill: "#fff",
-// 		            pointHighlightStroke: "rgba(151,187,205,1)",
-// 		            data: [28, 48, 40, 19, 86, 27, 90]
-//             	},
-//             	{
-// 		            label: "Chipotle",
-// 		            fillColor: "rgba(151,187,205,0.2)",
-// 		            strokeColor: "rgba(151,187,205,1)",
-// 		            pointColor: "rgba(151,187,205,1)",
-// 		            pointStrokeColor: "#fff",
-// 		            pointHighlightFill: "#fff",
-// 		            pointHighlightStroke: "rgba(151,187,205,1)",
-// 		            data: [28, 48, 40, 19, 86, 27, 90]
-//             	},
-//             	{
-// 		            label: "Disney",
-// 		            fillColor: "rgba(151,187,205,0.2)",
-// 		            strokeColor: "rgba(151,187,205,1)",
-// 		            pointColor: "rgba(151,187,205,1)",
-// 		            pointStrokeColor: "#fff",
-// 		            pointHighlightFill: "#fff",
-// 		            pointHighlightStroke: "rgba(151,187,205,1)",
-// 		            data: [28, 48, 40, 19, 86, 27, 90]
-//             	},
-//             	{
-// 		            label: "Facebook",
-// 		            fillColor: "rgba(151,187,205,0.2)",
-// 		            strokeColor: "rgba(151,187,205,1)",
-// 		            pointColor: "rgba(151,187,205,1)",
-// 		            pointStrokeColor: "#fff",
-// 		            pointHighlightFill: "#fff",
-// 		            pointHighlightStroke: "rgba(151,187,205,1)",
-// 		            data: [28, 48, 40, 19, 86, 27, 90]
-//             	},
-//             	{
-// 		            label: "Google",
-// 		            fillColor: "rgba(151,187,205,0.2)",
-// 		            strokeColor: "rgba(151,187,205,1)",
-// 		            pointColor: "rgba(151,187,205,1)",
-// 		            pointStrokeColor: "#fff",
-// 		            pointHighlightFill: "#fff",
-// 		            pointHighlightStroke: "rgba(151,187,205,1)",
-// 		            data: [28, 48, 40, 19, 86, 27, 90]
-//             	},
-//             	{
-// 		            label: "Microsoft",
-// 		            fillColor: "rgba(151,187,205,0.2)",
-// 		            strokeColor: "rgba(151,187,205,1)",
-// 		            pointColor: "rgba(151,187,205,1)",
-// 		            pointStrokeColor: "#fff",
-// 		            pointHighlightFill: "#fff",
-// 		            pointHighlightStroke: "rgba(151,187,205,1)",
-// 		            data: [28, 48, 40, 19, 86, 27, 90]
-//             	},
-//             	{
-// 		            label: "Nike",
-// 		            fillColor: "rgba(151,187,205,0.2)",
-// 		            strokeColor: "rgba(151,187,205,1)",
-// 		            pointColor: "rgba(151,187,205,1)",
-// 		            pointStrokeColor: "#fff",
-// 		            pointHighlightFill: "#fff",
-// 		            pointHighlightStroke: "rgba(151,187,205,1)",
-// 		            data: [28, 48, 40, 19, 86, 27, 90]
-//             	},
-//             	{
-// 		            label: "Tesla",
-// 		            fillColor: "rgba(151,187,205,0.2)",
-// 		            strokeColor: "rgba(151,187,205,1)",
-// 		            pointColor: "rgba(151,187,205,1)",
-// 		            pointStrokeColor: "#fff",
-// 		            pointHighlightFill: "#fff",
-// 		            pointHighlightStroke: "rgba(151,187,205,1)",
-// 		            data: [28, 48, 40, 19, 86, 27, 90]
-//             	},
-//             	{
-// 		            label: "Twitter",
-// 		            fillColor: "rgba(151,187,205,0.2)",
-// 		            strokeColor: "rgba(151,187,205,1)",
-// 		            pointColor: "rgba(151,187,205,1)",
-// 		            pointStrokeColor: "#fff",
-// 		            pointHighlightFill: "#fff",
-// 		            pointHighlightStroke: "rgba(151,187,205,1)",
-// 		            data: [28, 48, 40, 19, 86, 27, 90]
-//             	},             	             	             	
-//     		]
-    	// }
     	var myChart = new Chart(sentiments).Scatter(scatterData);
 	});   
 };
-
-
 //loads StockPriceChartData
 
 function loadStockPriceChartData(url) {
+	// console.log('load stock price chart')
 	$.get(url, function (jsondata){ 
+		// console.log(jsondata)
 		var dates = jsondata['data'][0]['dates'],
 			 datesArray = Object.keys(dates);
+
+		var stockData = []
+		var color = ['#F16220','#F99E15', '#DA6E12', '#DA4321', '#F91A15', '#F9244F', '#DA20A3', '#DB2FF1', '#9220DA', '#6D24F9'];
 
 		for (var i = 0, len = jsondata['data'].length; i < len; i++) {
 			var cachedDates = jsondata['data'][i]['dates'];
@@ -202,117 +146,32 @@ function loadStockPriceChartData(url) {
 				var historicalStockPrice = cachedDates[dateKey]['historical_stock_price']
 				historicalStocksArray.push(historicalStockPrice);		
 			}
-			console.log(historicalStocksArray);	
+			console.log(historicalStocksArray);
+
+			var stockObj = jsondata['data'][i];
+			var dataObj = {
+				label : stockObj.name,
+				fillColor: 'transparent', //dcolor[i],
+            	strokeColor: color[i],
+            	pointColor: color[i],
+            	pointStrokeColor: "#fff",
+            	pointHighlightFill: "#fff",
+            	pointHighlightStroke: color[i],
+            	data: historicalStocksArray
+            };
+
+            stockData.push(dataObj)
 		}
 
-		
-    	var sentiments = document.getElementById('stockchart').getContext('2d');
-    	var data = {
-    		labels: datesArray,
-    		datasets: [
-	    		{
-	    			label: "Alibaba",
-	            	fillColor: "rgba(220,220,220,0.2)",
-	            	strokeColor: "rgba(220,220,220,1)",
-	            	pointColor: "rgba(220,220,220,1)",
-	            	pointStrokeColor: "#fff",
-	            	pointHighlightFill: "#fff",
-	            	pointHighlightStroke: "rgba(220,220,220,1)",
-	            	data: [65, 59, 80, 81, 56, 55, 40]
-            	},
-            	{
-		            label: "Apple",
-		            fillColor: "rgba(151,187,205,0.2)",
-		            strokeColor: "rgba(151,187,205,1)",
-		            pointColor: "rgba(151,187,205,1)",
-		            pointStrokeColor: "#fff",
-		            pointHighlightFill: "#fff",
-		            pointHighlightStroke: "rgba(151,187,205,1)",
-		            data: [28, 48, 40, 19, 86, 27, 90]
-            	},
-            	{
-		            label: "Chipotle",
-		            fillColor: "rgba(151,187,205,0.2)",
-		            strokeColor: "rgba(151,187,205,1)",
-		            pointColor: "rgba(151,187,205,1)",
-		            pointStrokeColor: "#fff",
-		            pointHighlightFill: "#fff",
-		            pointHighlightStroke: "rgba(151,187,205,1)",
-		            data: [28, 48, 40, 19, 86, 27, 90]
-            	},
-            	{
-		            label: "Disney",
-		            fillColor: "rgba(151,187,205,0.2)",
-		            strokeColor: "rgba(151,187,205,1)",
-		            pointColor: "rgba(151,187,205,1)",
-		            pointStrokeColor: "#fff",
-		            pointHighlightFill: "#fff",
-		            pointHighlightStroke: "rgba(151,187,205,1)",
-		            data: [28, 48, 40, 19, 86, 27, 90]
-            	},
-            	{
-		            label: "Facebook",
-		            fillColor: "rgba(151,187,205,0.2)",
-		            strokeColor: "rgba(151,187,205,1)",
-		            pointColor: "rgba(151,187,205,1)",
-		            pointStrokeColor: "#fff",
-		            pointHighlightFill: "#fff",
-		            pointHighlightStroke: "rgba(151,187,205,1)",
-		            data: [28, 48, 40, 19, 86, 27, 90]
-            	},
-            	{
-		            label: "Google",
-		            fillColor: "rgba(151,187,205,0.2)",
-		            strokeColor: "rgba(151,187,205,1)",
-		            pointColor: "rgba(151,187,205,1)",
-		            pointStrokeColor: "#fff",
-		            pointHighlightFill: "#fff",
-		            pointHighlightStroke: "rgba(151,187,205,1)",
-		            data: [28, 48, 40, 19, 86, 27, 90]
-            	},
-            	{
-		            label: "Microsoft",
-		            fillColor: "rgba(151,187,205,0.2)",
-		            strokeColor: "rgba(151,187,205,1)",
-		            pointColor: "rgba(151,187,205,1)",
-		            pointStrokeColor: "#fff",
-		            pointHighlightFill: "#fff",
-		            pointHighlightStroke: "rgba(151,187,205,1)",
-		            data: [28, 48, 40, 19, 86, 27, 90]
-            	},
-            	{
-		            label: "Nike",
-		            fillColor: "rgba(151,187,205,0.2)",
-		            strokeColor: "rgba(151,187,205,1)",
-		            pointColor: "rgba(151,187,205,1)",
-		            pointStrokeColor: "#fff",
-		            pointHighlightFill: "#fff",
-		            pointHighlightStroke: "rgba(151,187,205,1)",
-		            data: [28, 48, 40, 19, 86, 27, 90]
-            	},
-            	{
-		            label: "Tesla",
-		            fillColor: "rgba(151,187,205,0.2)",
-		            strokeColor: "rgba(151,187,205,1)",
-		            pointColor: "rgba(151,187,205,1)",
-		            pointStrokeColor: "#fff",
-		            pointHighlightFill: "#fff",
-		            pointHighlightStroke: "rgba(151,187,205,1)",
-		            data: [28, 48, 40, 19, 86, 27, 90]
-            	},
-            	{
-		            label: "Twitter",
-		            fillColor: "rgba(151,187,205,0.2)",
-		            strokeColor: "rgba(151,187,205,1)",
-		            pointColor: "rgba(151,187,205,1)",
-		            pointStrokeColor: "#fff",
-		            pointHighlightFill: "#fff",
-		            pointHighlightStroke: "rgba(151,187,205,1)",
-		            data: [28, 48, 40, 19, 86, 27, 90]
-            	},             	             	             	
-    		]
-    	}
-    	var myChart = new Chart(sentiments).Line(data);
+        console.log(stockData);
+
+        var chartData = {
+        	labels: datesArray,
+        	datasets: stockData
+        }
+
+    	var stockprices = document.getElementById('stockchart').getContext('2d');
+    	var myChart = new Chart(stockprices).Line(chartData);
 	});   
 };
 

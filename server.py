@@ -57,7 +57,7 @@ def make_json_object():
 		} 
 
 		date_dict = ticker_dict['dates']
-		import pprint; pprint.pprint(ticker_dict)
+		# import pprint; pprint.pprint(ticker_dict)
 
 		probability_list = []
 		for single_date in (start_date + datetime.timedelta(n) for n in range(day_count)): 
@@ -66,12 +66,12 @@ def make_json_object():
 			second_date = (single_date + datetime.timedelta(1)).strftime(DATE_FORMAT)
 			tweets = db.session.query(Tweet).filter(Tweet.tweet_created_at.between(first_date, second_date)).filter_by(stockticker_id=name).all()
 			historical_stock_price_obj = db.session.query(StockPrice).filter(StockPrice.date.between(first_date,second_date)).filter_by(stockticker_id=ticker).all()
-			historical_stock_price = [stock.stock_price for stock in historical_stock_price_obj]
-
+			historical_stock_price = historical_stock_price_obj[0].stock_price if len(historical_stock_price_obj) > 0 else 0
+			#print historical_stock_price
 			if len(tweets) != 0:
 				date_dict[first_date] = {
 					'unix_time' : unix_date,
-					'historical_stock_price' : historical_stock_price,
+					'historical_stock_price': historical_stock_price,
 					'probability_avg' : numpy.mean([tweet.likelihood_probability for tweet in tweets]),
 					'probability_median' : numpy.median([tweet.likelihood_probability for tweet in tweets]),
 					'standard_dev' : numpy.std([tweet.likelihood_probability for tweet in tweets]),
