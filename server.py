@@ -1,6 +1,6 @@
 from flask import Flask, render_template, jsonify, send_from_directory, request
 from model import User, Stock, UserStock, TwitterHandle, Tweet, Sentiment, connect_to_db, db, StockPrice
-import datetime
+import datetime, time
 import urllib2, urllib, json
 from urllib2 import Request, urlopen 
 from sqlalchemy.sql import func
@@ -57,17 +57,22 @@ def make_json_object():
 		} 
 
 		date_dict = ticker_dict['dates']
-		#import pprint; pprint.pprint(ticker_dict)
-		##create an array
+		import pprint; pprint.pprint(ticker_dict)
+
 		probability_list = []
 		for single_date in (start_date + datetime.timedelta(n) for n in range(day_count)): 
-			print single_date
+			unix_date = time.mktime(single_date.timetuple())
 			first_date = single_date.strftime(DATE_FORMAT)
 			second_date = (single_date + datetime.timedelta(1)).strftime(DATE_FORMAT)
 			tweets = db.session.query(Tweet).filter(Tweet.tweet_created_at.between(first_date, second_date)).filter_by(stockticker_id=name).all()
+			historical_stock_price_obj = db.session.query(StockPrice).filter(StockPrice.date.between(first_date,second_date)).filter_by(stockticker_id=ticker).all()
+			historical_stock_price = [stock.stock_price for stock in historical_stock_price_obj]
+
 			if len(tweets) != 0:
 				date_dict[first_date] = {
-					'probability_avg': numpy.mean([tweet.likelihood_probability for tweet in tweets]),
+					'unix_time' : unix_date,
+					'historical_stock_price' : historical_stock_price,
+					'probability_avg' : numpy.mean([tweet.likelihood_probability for tweet in tweets]),
 					'probability_median' : numpy.median([tweet.likelihood_probability for tweet in tweets]),
 					'standard_dev' : numpy.std([tweet.likelihood_probability for tweet in tweets]),
 					'tweets': [{'text': tweet.raw_tweet_text,'url' : tweet.tweet_url} for tweet in tweets]
@@ -79,10 +84,11 @@ def make_json_object():
 
 		main_list.append(ticker_dict)
 
+	# import pprint; pprint.pprint({'data': main_list})
+
 	json_object = jsonify({'data': main_list})
 
 	return json_object
-
 
 def get_stockprice(stock_ticker=None):
 
