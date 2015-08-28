@@ -35,6 +35,8 @@ $(function () {
 	$('tbody').on('click', '.stock-row', function(){
 		var tr = $(this);
         var row = apiTable.row(tr);
+        var stockName = $(this).children('.sorting_1').text()
+        console.log(stockName)
  
         if ( row.child.isShown() ) {
             // This row is already open - close it
@@ -84,6 +86,16 @@ $(function () {
 		return dateTable;
 	}
 });
+
+// function filterChart(jsondata) {
+// 	for (var i=0; i < jsondata['data'].length; i++){
+// 			// for each stock, make a data obj
+// 			var stockObj = jsondata['data'][i];
+// 			var dataObj = {
+// 				label : stockObj.name,		
+
+// 			};
+// };
 
 //loads SentimentChartData
 
@@ -190,3 +202,5 @@ var getUrlParameter = function getUrlParameter(sParam) {
         }
     }
 };
+
+
