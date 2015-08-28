@@ -27,10 +27,6 @@ $(function () {
 	});
 
 	var apiTable = new $.fn.dataTable.Api( '#analysis-table' );
-	//make ajax call to call the json object in /json route. It will return the json object into the function as the data argument
-	$.get(url, function (data) {
-		// console.log('data: ', data);
-	});
 
 	$('tbody').on('click', '.stock-row', function(){
 		var tr = $(this);
@@ -87,12 +83,15 @@ $(function () {
 	}
 });
 
-// function filterChart(jsondata) {
-// 	for (var i=0; i < jsondata['data'].length; i++){
-// 			// for each stock, make a data obj
-// 			var stockObj = jsondata['data'][i];
-// 			var dataObj = {
-// 				label : stockObj.name,		
+// function filterChart(url) {
+// 	$.get(url, function(jsondata) {
+// 		for (var i=0; i < jsondata['data'].length; i++){
+// 		// for each stock, make a data obj
+// 		var stockObj = jsondata['data'][i];
+// 		var dataObj = {
+// 			label : stockObj.name,	
+// 	}
+	
 
 // 			};
 // };
@@ -123,8 +122,9 @@ function loadChartData(url) {
 			var keysList = Object.keys(stockObj.dates);
 			for (var j = 0; j < keysList.length; j++) {
 				var dateObj = stockObj.dates[keysList[j]];
+				var unixTime = dateObj.unix_time;
 				var xyObj = {
-					x : dateObj.unix_time,
+					x : new Date(dateObj.unix_time * 1000),
 					y : dateObj.probability_avg
 				};
 				xyData.push(xyObj);
@@ -135,55 +135,81 @@ function loadChartData(url) {
 		}
 
 		var sentiments = document.getElementById('sentimentchart').getContext('2d');
-    	var myChart = new Chart(sentiments).Scatter(scatterData);
+    	var myChart = new Chart(sentiments).Scatter(scatterData, {scaleType: 'date'});
 	});   
 };
+
+
+var fortune_you_got;
+
+function getFortune() {
+	$.get("/fortunes", function(data) {
+        fortune_you_got = data;
+        return "WHO CARES";
+	});
+	alert("HEY");
+}
+
+
+
+
+var companyData;
+getChartData() {
+	... get jsonblob sav as companyData
+	call drawGraph(blob);
+}
+
+drawGraph(data) {
+	... second half of that
+}
+
+onClick Google {
+var newData = [];
+var number_companies = jsonblob['data'].length;
+for (i ... comanies)
+   if i.name == 'Google'
+   	   newData.append(i)
+}
+
 //loads StockPriceChartData
 
 function loadStockPriceChartData(url) {
-	// console.log('load stock price chart')
-	$.get(url, function (jsondata){ 
-		// console.log(jsondata)
+	$.get(url, function (jsondata){
 		var dates = jsondata['data'][0]['dates'],
 			 datesArray = Object.keys(dates);
 
-		var stockData = []
-		var color = ['#F16220','#F99E15', '#DA6E12', '#DA4321', '#F91A15', '#F9244F', '#DA20A3', '#DB2FF1', '#9220DA', '#6D24F9'];
+		var scatterData = [];
+		var strokeColor = ['#F16220','#F99E15', '#DA6E12', '#DA4321', '#F91A15', '#F9244F', '#DA20A3', '#DB2FF1', '#9220DA', '#6D24F9'];
+		
+		// jsondata.data = Array(jsondata['data'][0]);
 
-		for (var i = 0, len = jsondata['data'].length; i < len; i++) {
-			var cachedDates = jsondata['data'][i]['dates'];
-			var historicalStocksArray = [];
-
-			for (var dateKey in cachedDates) {
-				var historicalStockPrice = cachedDates[dateKey]['historical_stock_price']
-				historicalStocksArray.push(historicalStockPrice);		
-			}
-			console.log(historicalStocksArray);
-
+		for (var i=0; i < jsondata['data'].length; i++){
+			// for each stock, make a data obj
 			var stockObj = jsondata['data'][i];
 			var dataObj = {
 				label : stockObj.name,
-				fillColor: 'transparent', //dcolor[i],
-            	strokeColor: color[i],
-            	pointColor: color[i],
-            	pointStrokeColor: "#fff",
-            	pointHighlightFill: "#fff",
-            	pointHighlightStroke: color[i],
-            	data: historicalStocksArray
-            };
+				strokeColor: strokeColor[i],
+		      	pointColor: strokeColor[i],
+		      	pointStrokeColor: '#fff',		
 
-            stockData.push(dataObj)
+			};
+			var xyData = [];
+			var keysList = Object.keys(stockObj.dates);
+			for (var j = 0; j < keysList.length; j++) {
+				var dateObj = stockObj.dates[keysList[j]];
+				var xyObj = {
+					x : new Date(dateObj.unix_time * 1000),
+					y : dateObj.historical_stock_price
+				};
+				xyData.push(xyObj);
+			};
+
+			dataObj.data = xyData;
+			scatterData.push(dataObj);
 		}
 
-        console.log(stockData);
-
-        var chartData = {
-        	labels: datesArray,
-        	datasets: stockData
-        }
-
-    	var stockprices = document.getElementById('stockchart').getContext('2d');
-    	var myChart = new Chart(stockprices).Line(chartData);
+		var stockprices = document.getElementById('stockchart').getContext('2d');
+    	var myChart = new Chart(stockprices).Scatter(scatterData, {scaleType: 'date'});
 	});   
 };
 
