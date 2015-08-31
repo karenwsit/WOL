@@ -69,7 +69,14 @@ def make_json_object():
 			historical_stock_price_obj = db.session.query(StockPrice).filter(StockPrice.date.between(first_date,second_date)).filter_by(stockticker_id=ticker).all()
 			if len(historical_stock_price_obj) > 0:
 				historical_stock_price = historical_stock_price_obj[0].stock_price 
-			#print historical_stock_price
+
+			print "FULL LIST:", historical_stock_price_obj
+
+			for obj in range(len(historical_stock_price_obj)):
+				print obj
+
+				
+			
 			if len(tweets) != 0:
 				date_dict[first_date] = {
 					'unix_time' : unix_date,

@@ -4,14 +4,14 @@
 var jsonChartData;
 
 $(function () {
-	var startDateParam = getUrlParameter('startDate') || '2015-07-19'
-	var endDateParam = getUrlParameter('endDate') || '2015-08-17'
+	var startDateParam = getUrlParameter('startDate') || '2015-07-19';
+	var endDateParam = getUrlParameter('endDate') || '2015-08-17';
 
 	var url = '/json?startDate=' + startDateParam + '&endDate=' + endDateParam;
 
 	// loadChartData(url);
-	loadStockPriceChartData(url);
 	getChartData(url);
+	// drawStockChart(url);
 
 	$('#analysis-table').dataTable({
 		ajax: url,
@@ -31,13 +31,13 @@ $(function () {
 	$('tbody').on('click', '.stock-row', function(){
 		var tr = $(this);
         var row = apiTable.row(tr);
-        var stockName = $(this).children('.sorting_1').text()
+        var stockName = $(this).children('.sorting_1').text();
  
         if ( row.child.isShown() ) {
             // This row is already open - close it
             row.child.hide();
             tr.removeClass('shown');
-            drawChart(jsonChartData);
+            drawSentimentChart(jsonChartData);
         }
         else {
             // Open this row
@@ -48,8 +48,8 @@ $(function () {
 				if (jsonChartData.data[i].name == stockName) {
 					var stockObj = {
 						'data' : [jsonChartData.data[i]]
-					}
-					drawChart(stockObj);
+					};
+					drawSentimentChart(stockObj);
 				}  	  
 			}
         }
@@ -75,7 +75,7 @@ $(function () {
 			$dateRow.append($tweetCell);
 
 			for (var i = 0; i < dateObj['tweets'].length; i++){
-				var tweetObj = dateObj['tweets'][i]
+				var tweetObj = dateObj['tweets'][i];
 				var $tweetLink = $('<a>');
 				$tweetLink.text(tweetObj.text);
 				$tweetLink.attr({
@@ -92,18 +92,17 @@ $(function () {
 	}
 });
 
-
-//loads SentimentChartData
+//loads jsonObject for both Charts
 var getChartData = function(url) {
 	$.get(url, function (jsondata){
 		jsonChartData = jsondata;
-		drawChart(jsondata)	
-		console.log(jsondata)		
+		drawSentimentChart(jsondata);
+		drawStockChart(jsondata);		
 	});
 };
 
 //draws the Chart
-function drawChart(jsonblob){
+function drawSentimentChart(jsonblob){
 	var scatterData = [];
 	var strokeColor = ['#F16220','#F99E15', '#DA6E12', '#DA4321', '#F91A15', '#F9244F', '#DA20A3', '#DB2FF1', '#9220DA', '#6D24F9'];
 		
@@ -129,7 +128,7 @@ function drawChart(jsonblob){
 				y : dateObj.probability_avg
 			};
 			xyData.push(xyObj);
-		};
+		}
 
 		dataObj.data = xyData;
 		scatterData.push(dataObj);
@@ -137,49 +136,44 @@ function drawChart(jsonblob){
 
 	var sentiments = document.getElementById('sentimentchart').getContext('2d');
 	var myChart = new Chart(sentiments).Scatter(scatterData, {scaleType: 'date'});   	
-};	
+}	
 
 
 //loads StockPriceChartData
-
-function loadStockPriceChartData(url) {
-	$.get(url, function (jsondata){
-		var dates = jsondata['data'][0]['dates'],
-			 datesArray = Object.keys(dates);
-
-		var scatterData = [];
-		var strokeColor = ['#F16220','#F99E15', '#DA6E12', '#DA4321', '#F91A15', '#F9244F', '#DA20A3', '#DB2FF1', '#9220DA', '#6D24F9'];
+function drawStockChart(jsonblob2) {
+	var scatterData = [];
+	var strokeColor = ['#F16220','#F99E15', '#DA6E12', '#DA4321', '#F91A15', '#F9244F', '#DA20A3', '#DB2FF1', '#9220DA', '#6D24F9'];
 		
-		// jsondata.data = Array(jsondata['data'][0]);
+	// jsondata.data = Array(jsondata['data'][0]);
+	// debugger;
 
-		for (var i=0; i < jsondata['data'].length; i++){
-			// for each stock, make a data obj
-			var stockObj = jsondata['data'][i];
-			var dataObj = {
-				label : stockObj.name,
-				strokeColor: strokeColor[i],
-		      	pointColor: strokeColor[i],
-		      	pointStrokeColor: '#fff',		
+	for (var i=0; i < jsonblob2['data'].length; i++){
+		// for each stock, make a data obj
+		var stockObj = jsonblob2['data'][i];
+		var dataObj = {
+			label : stockObj.name,
+			strokeColor: strokeColor[i],
+	      	pointColor: strokeColor[i],
+	      	pointStrokeColor: '#fff',		
 
+		};
+		var xyData = [];
+		var keysList = Object.keys(stockObj.dates);
+		for (var j = 0; j < keysList.length; j++) {
+			var dateObj = stockObj.dates[keysList[j]];
+			var xyObj = {
+				x : new Date(dateObj.unix_time * 1000),
+				y : dateObj.historical_stock_price
 			};
-			var xyData = [];
-			var keysList = Object.keys(stockObj.dates);
-			for (var j = 0; j < keysList.length; j++) {
-				var dateObj = stockObj.dates[keysList[j]];
-				var xyObj = {
-					x : new Date(dateObj.unix_time * 1000),
-					y : dateObj.historical_stock_price
-				};
-				xyData.push(xyObj);
-			};
+			xyData.push(xyObj);
+		};
 
-			dataObj.data = xyData;
-			scatterData.push(dataObj);
-		}
+		dataObj.data = xyData;
+		scatterData.push(dataObj);
+	}
 
-		var stockprices = document.getElementById('stockchart').getContext('2d');
-    	var myChart = new Chart(stockprices).Scatter(scatterData, {scaleType: 'date'});
-	});   
+	var stockprices = document.getElementById('stockchart').getContext('2d');
+	var myChart = new Chart(stockprices).Scatter(scatterData, {scaleType: 'date'});
 };
 
 
