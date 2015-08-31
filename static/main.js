@@ -38,6 +38,7 @@ $(function () {
             row.child.hide();
             tr.removeClass('shown');
             drawSentimentChart(jsonChartData);
+            drawStockChart(jsonChartData);
         }
         else {
             // Open this row
@@ -50,6 +51,7 @@ $(function () {
 						'data' : [jsonChartData.data[i]]
 					};
 					drawSentimentChart(stockObj);
+					drawStockChart(stockObj);
 				}  	  
 			}
         }

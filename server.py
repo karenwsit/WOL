@@ -41,10 +41,12 @@ def static_files(file_name):
 @app.route("/json")
 def make_json_object():
 	main_list = []
-	start = request.args.get("startDate")
+	# start = request.args.get("startDate")
+	start = '2015-07-20'
 	end = request.args.get("endDate")
 
 	start_date = datetime.datetime.strptime(start,(DATE_FORMAT))
+
 	end_date = datetime.datetime.strptime(end,(DATE_FORMAT))
 	day_count = (end_date - start_date).days + 1
 	print start_date, end_date
@@ -61,21 +63,19 @@ def make_json_object():
 		# else -1
 
 		probability_list = []
-		for single_date in (start_date + datetime.timedelta(n) for n in range(day_count)): 
+
+		for single_date in (start_date + datetime.timedelta(n) for n in range(day_count)):
+
 			unix_date = time.mktime(single_date.timetuple())
 			first_date = single_date.strftime(DATE_FORMAT)
 			second_date = (single_date + datetime.timedelta(1)).strftime(DATE_FORMAT)
 			tweets = db.session.query(Tweet).filter(Tweet.tweet_created_at.between(first_date, second_date)).filter_by(stockticker_id=name).all()
-			historical_stock_price_obj = db.session.query(StockPrice).filter(StockPrice.date.between(first_date,second_date)).filter_by(stockticker_id=ticker).all()
+			historical_stock_price_obj = db.session.query(StockPrice).filter(StockPrice.date.between(first_date,second_date)).filter_by(stockticker_id=ticker).all()  # is a list, but asking for only 1 date
+
+			print "FULL LIST:", historical_stock_price_obj     # is either 1 obj in list, or is empty
+
 			if len(historical_stock_price_obj) > 0:
 				historical_stock_price = historical_stock_price_obj[0].stock_price 
-
-			print "FULL LIST:", historical_stock_price_obj
-
-			for obj in range(len(historical_stock_price_obj)):
-				print obj
-
-				
 			
 			if len(tweets) != 0:
 				date_dict[first_date] = {
