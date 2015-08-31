@@ -45,6 +45,7 @@ $(function () {
             row.child( createChildTable(row.data()) ).show();
             tr.addClass('shown');
 			var number_companies = jsonChartData['data'].length;
+			debugger;
 			for (var i = 0; i < number_companies; i++){
 				if (jsonChartData.data[i].name == stockName) {
 					var stockObj = {
