@@ -17,8 +17,23 @@ $(function () {
 		ajax: url,
 		columns: [
 			{ data: 'name' },
-			{ data: 'overall_sentiment'},
-			{ data: 'overall_prob'},
+			{ 
+				data: 'overall_sentiment',
+				render: function(data) {
+					if (data == 'POSITIVE') {
+						return '<div class="sentiment positive">'+ 'Woo hoo' +'</div>'
+					}
+					else if (data == 'NEGATIVE') {
+						return '<div class="sentiment negative">'+ 'Boo hoo' +'</div>'
+					}
+				}
+			},
+			{ 
+				data: 'overall_prob',
+				render: function(data) {
+					return (data*100).toFixed(2) + '%';
+				}
+			},
 			{ data: 'current_stock_price'}
 		],
 		createdRow: function (row) {
@@ -45,7 +60,7 @@ $(function () {
             row.child( createChildTable(row.data()) ).show();
             tr.addClass('shown');
 			var number_companies = jsonChartData['data'].length;
-			debugger;
+			// debugger;
 			for (var i = 0; i < number_companies; i++){
 				if (jsonChartData.data[i].name == stockName) {
 					var stockObj = {
@@ -70,11 +85,11 @@ $(function () {
 		for (var dateKey in data.dates) {
 			var dateObj = data.dates[dateKey];
 			var $dateRow = $('<tr>');
-			var $tweetCell = $('<td>');
+			var $tweetCell = $('<td class="tweet-cell">');
 
 			$tbody.append($dateRow);
 			
-			$dateRow.append($('<td>').text(dateKey));
+			$dateRow.append($('<td class="date-cell">').text(dateKey));
 			$dateRow.append($tweetCell);
 
 			for (var i = 0; i < dateObj['tweets'].length; i++){
@@ -119,7 +134,6 @@ function drawSentimentChart(jsonblob){
 			strokeColor: strokeColor[i],
 	      	pointColor: strokeColor[i],
 	      	pointStrokeColor: '#fff',		
-
 		};
 		var xyData = [];
 		var keysList = Object.keys(stockObj.dates);
@@ -138,7 +152,38 @@ function drawSentimentChart(jsonblob){
 	}
 
 	var sentiments = document.getElementById('sentimentchart').getContext('2d');
-	var myChart = new Chart(sentiments).Scatter(scatterData, {scaleType: 'date'});   	
+	var canvas = document.getElementById('sentimentchart');
+	// debugger;
+	var myChart = new Chart(sentiments).Scatter(scatterData, {scaleType: 'date'}); 
+	// debugger;
+	//gradient background color for sentiment graph
+
+	// var scaleMax = myChart.scale["y-axis-1"].max;
+	// var scaleHeight = myChart.scale["y-axis-1"].height;
+	// var allowance = .50;
+	// var bottomPadding = canvas.height - myChart.scales["y-axis-1"].bottom;
+	// var overRatio = allowance/scaleMax;
+	// if(overRatio < 1) {
+	// var tweakedRatio = (bottomPadding + (overRatio*scaleHeight))/canvas.height;
+	// }
+	// else {
+	// var tweakedRatio = 1;
+	// }
+
+	var gradient = sentiments.createLinearGradient(0, canvas.height, 0, 0);
+	gradient.addColorStop(0, "rgba(0, 164, 228,0.2)");  
+	gradient.addColorStop(0, "rgba(0, 164, 228,0.2)"); 
+
+	// if(tweakedRatio < 1) {
+	// // gradient.addColorStop(, "rgba(165, 30, 34,0.2)");   
+	// gradient.addColorStop(1, "rgba(165, 30, 34,0.2)");}
+	console.log(myChart);
+	myChart.datasets[0].backgroundColor = gradient;
+	myChart.update();
+
+
+
+	  	
 }	
 
 

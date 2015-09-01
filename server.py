@@ -21,8 +21,8 @@ stocks = {
 	'FB' : 'Facebook'
 	}
 DATE_FORMAT = '%Y-%m-%d'
-POSITIVE = 'Hell Yeah'
-NEGATIVE = 'BRB Crying'
+POSITIVE = 'POSITIVE'
+NEGATIVE = 'NEGATIVE'
 
 @app.route("/")
 def index():
@@ -49,20 +49,21 @@ def make_json_object():
 
 	end_date = datetime.datetime.strptime(end,(DATE_FORMAT))
 	day_count = (end_date - start_date).days + 1
-	print start_date, end_date
 
 	for ticker, name in stocks.iteritems():
 		ticker_dict = {
 			'name': name,
 			'dates': {},
-			'current_stock_price' : get_stockprice(ticker)
+			'current_stock_price': 0
+			#'current_stock_price' : get_stockprice(ticker)
 		} 
 
 		date_dict = ticker_dict['dates']
 		# import pprint; pprint.pprint(ticker_dict)
-		# else -1
+
 
 		probability_list = []
+
 
 		for single_date in (start_date + datetime.timedelta(n) for n in range(day_count)):
 
@@ -71,8 +72,6 @@ def make_json_object():
 			second_date = (single_date + datetime.timedelta(1)).strftime(DATE_FORMAT)
 			tweets = db.session.query(Tweet).filter(Tweet.tweet_created_at.between(first_date, second_date)).filter_by(stockticker_id=name).all()
 			historical_stock_price_obj = db.session.query(StockPrice).filter(StockPrice.date.between(first_date,second_date)).filter_by(stockticker_id=ticker).all()  # is a list, but asking for only 1 date
-
-			print "FULL LIST:", historical_stock_price_obj     # is either 1 obj in list, or is empty
 
 			if len(historical_stock_price_obj) > 0:
 				historical_stock_price = historical_stock_price_obj[0].stock_price 
