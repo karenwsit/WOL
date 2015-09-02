@@ -8,10 +8,10 @@ $(function () {
 	var endDateParam = getUrlParameter('endDate') || '2015-08-17';
 
 	var url = '/json?startDate=' + startDateParam + '&endDate=' + endDateParam;
-
 	// loadChartData(url);
 	getChartData(url);
 	// drawStockChart(url);
+
 
 	$('#analysis-table').dataTable({
 		ajax: url,
@@ -34,7 +34,12 @@ $(function () {
 					return (data*100).toFixed(2) + '%';
 				}
 			},
-			{ data: 'current_stock_price'}
+			{ 
+				data: 'current_stock_price',
+				render: function(data) {
+					return '$' + (data*1).toFixed(2);
+				}
+			}
 		],
 		createdRow: function (row) {
 			$(row).addClass('stock-row');
@@ -42,6 +47,7 @@ $(function () {
 	});
 
 	var apiTable = new $.fn.dataTable.Api( '#analysis-table' );
+
 
 	$('tbody').on('click', '.stock-row', function(){
 		var tr = $(this);
@@ -114,15 +120,18 @@ $(function () {
 var getChartData = function(url) {
 	$.get(url, function (jsondata){
 		jsonChartData = jsondata;
+
 		drawSentimentChart(jsondata);
-		drawStockChart(jsondata);		
+
+		drawStockChart(jsondata);	
+			
 	});
 };
 
 //draws the Chart
 function drawSentimentChart(jsonblob){
 	var scatterData = [];
-	var strokeColor = ['#F16220','#F99E15', '#DA6E12', '#DA4321', '#F91A15', '#F9244F', '#DA20A3', '#DB2FF1', '#9220DA', '#6D24F9'];
+	var strokeColor = ['#4FB7C0','#F99E15', '#DA6E12', '#DA4321', '#F91A15', '#F9244F', '#DA20A3', '#DB2FF1', '#9220DA', '#6D24F9'];
 		
 	// jsondata.data = Array(jsondata['data'][0]);
 
@@ -177,7 +186,7 @@ function drawSentimentChart(jsonblob){
 	// if(tweakedRatio < 1) {
 	// // gradient.addColorStop(, "rgba(165, 30, 34,0.2)");   
 	// gradient.addColorStop(1, "rgba(165, 30, 34,0.2)");}
-	console.log(myChart);
+	// console.log(myChart);
 	myChart.datasets[0].backgroundColor = gradient;
 	myChart.update();
 
@@ -190,7 +199,7 @@ function drawSentimentChart(jsonblob){
 //loads StockPriceChartData
 function drawStockChart(jsonblob2) {
 	var scatterData = [];
-	var strokeColor = ['#F16220','#F99E15', '#DA6E12', '#DA4321', '#F91A15', '#F9244F', '#DA20A3', '#DB2FF1', '#9220DA', '#6D24F9'];
+	var strokeColor = ['#4FB7C0','#F99E15', '#DA6E12', '#DA4321', '#F91A15', '#F9244F', '#DA20A3', '#DB2FF1', '#9220DA', '#6D24F9'];
 		
 	// jsondata.data = Array(jsondata['data'][0]);
 	// debugger;

@@ -1,8 +1,7 @@
 from flask import Flask, render_template, jsonify, send_from_directory, request
 from model import User, Stock, UserStock, TwitterHandle, Tweet, Sentiment, connect_to_db, db, StockPrice
 import datetime, time
-import urllib2, urllib, json
-from urllib2 import Request, urlopen 
+import requests
 from sqlalchemy.sql import func
 import numpy
 
@@ -44,7 +43,6 @@ def make_json_object():
 	# start = request.args.get("startDate")
 	start = '2015-07-20'
 	end = request.args.get("endDate")
-
 	start_date = datetime.datetime.strptime(start,(DATE_FORMAT))
 
 	end_date = datetime.datetime.strptime(end,(DATE_FORMAT))
@@ -54,10 +52,9 @@ def make_json_object():
 		ticker_dict = {
 			'name': name,
 			'dates': {},
-			'current_stock_price': 0
-			#'current_stock_price' : get_stockprice(ticker)
+			# 'current_stock_price': 0
+			'current_stock_price' : get_stockprice(ticker)
 		} 
-
 		date_dict = ticker_dict['dates']
 		# import pprint; pprint.pprint(ticker_dict)
 
@@ -102,11 +99,16 @@ def get_stockprice(stock_ticker=None):
 
 	stockprice_url_template = 'http://finance.yahoo.com/webservice/v1/symbols/{0}/quote?format=json'
 	stockprice_url = stockprice_url_template.format(stock_ticker)
-
-	req = Request(stockprice_url)
-	result_str = urlopen(req)
-	data = json.loads(result_str.read())
-
+	print stockprice_url
+	# req = Request(stockprice_url)
+	req = requests.get(stockprice_url)
+	print req
+	data = req.json()
+	# print req
+	# result_str = urlopen(req)
+	# print result_str
+	# data = json.loads(result_str.read())
+	# print data
 	return data['list']['resources'][0]['resource']['fields']['price']
 
 
