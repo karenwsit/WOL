@@ -99,10 +99,10 @@ def get_stockprice(stock_ticker=None):
 
 	stockprice_url_template = 'http://finance.yahoo.com/webservice/v1/symbols/{0}/quote?format=json'
 	stockprice_url = stockprice_url_template.format(stock_ticker)
-	print stockprice_url
+	# print stockprice_url
 	# req = Request(stockprice_url)
 	req = requests.get(stockprice_url)
-	print req
+	# print req
 	data = req.json()
 	# print req
 	# result_str = urlopen(req)

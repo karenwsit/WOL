@@ -4,6 +4,7 @@
 var jsonChartData;
 
 $(function () {
+	//TODO: remove this part
 	var startDateParam = getUrlParameter('startDate') || '2015-07-19';
 	var endDateParam = getUrlParameter('endDate') || '2015-08-17';
 
@@ -72,13 +73,15 @@ $(function () {
 					var stockObj = {
 						'data' : [jsonChartData.data[i]]
 					};
-					drawSentimentChart(stockObj);
+					drawSentimentChart(stock
 					drawStockChart(stockObj);
 				}  	  
 			}
         }
 	});
 
+	// Creates the jQuery DataTable child tables; takes in json object data & outputs specific tweets & dates
+	//  
 	function createChildTable (data) {
 		var dateTable = $('<table class="child-table">' +
 			'<thead><tr>'+
@@ -233,20 +236,5 @@ function drawStockChart(jsonblob2) {
 	var myChart = new Chart(stockprices).Scatter(scatterData, {scaleType: 'date'});
 };
 
-
-var getUrlParameter = function getUrlParameter(sParam) {
-    var sPageURL = decodeURIComponent(window.location.search.substring(1)),
-        sURLVariables = sPageURL.split('&'),
-        sParameterName,
-        i;
-
-    for (i = 0; i < sURLVariables.length; i++) {
-        sParameterName = sURLVariables[i].split('=');
-
-        if (sParameterName[0] === sParam) {
-            return sParameterName[1] === undefined ? true : sParameterName[1];
-        }
-    }
-};
 
 
