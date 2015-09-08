@@ -1,0 +1,99 @@
+/*body {
+	background-image: radial-gradient(rgba(0,0,0,.1), white)
+}*/
+
+h1 {
+	font-family: Raleway;
+	font-size: 48px;
+    font-weight: 200;
+    margin-bottom: 0;
+    vertical-align: bottom;
+}
+
+.wollogo {
+	width: 50px;
+	vertical-align: bottom;
+}
+
+h2 {
+	font-family: Raleway;
+	margin-top: 0;
+    font-size: 20px;
+    font-weight: 100;
+    line-height: 0.75;
+    text-indent: 55px;
+}
+
+label {
+	font-family: Raleway;
+	margin-top: 0;
+    font-size: 20px;
+    line-height: 0.75;
+    font-weight: 100;
+}
+
+.chart-container {
+	margin-bottom: 100px; 
+	margin-top: 75px;
+}
+
+label[for='sentimentchart'] {
+	margin-right: 50px;
+}
+
+#sentimentchart {
+	background: linear-gradient(to bottom, rgba(50, 200, 80, 0.05) 50%, rgba(200, 10, 30, .04) 50%);
+}
+
+.dataTable {
+	font-size: 16px;	
+}
+
+.tweet-cell {
+	padding: 2em 0;
+}
+
+.tweet-link {
+	display: block;
+	line-height: 2;
+	padding-left: 1em;
+}
+
+.date-cell {
+	vertical-align: top;
+	white-space: nowrap;
+}
+
+.tweet-link::before {
+	content: " - " ;
+}
+
+.dataTable tr {
+	line-height: 4;
+}
+
+.dataTable th {
+	font-family: Raleway;
+	line-height: 0.75;
+	font-weight: normal;
+    font-size: 16px;
+}
+
+.sentiment {
+	background-repeat: no-repeat;
+	background-size: contain;
+	background-position: left;
+	padding-left: 5em;
+}
+
+.stock-row.odd {
+	background-color: rgba(79,238,202,.3);
+}
+
+.positive {
+	background-image: url('/static/img/happy_owl.png');
+}
+
+.negative {
+	background-image: url('/static/img/sad_owl.png');
+}
