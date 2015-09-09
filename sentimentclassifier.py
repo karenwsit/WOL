@@ -2,7 +2,7 @@ from nltk.classify import NaiveBayesClassifier
 import nltk.classify.util
 import re
 import csv
-from model import User, Stock, UserStock, TwitterHandle, Tweet, Sentiment, connect_to_db, db
+from models.model import User, Stock, UserStock, TwitterHandle, Tweet, Sentiment, connect_to_db, db
 
 """
 Training & Testing NaiveBayesClassifier
@@ -43,7 +43,7 @@ def get_trained_classifier():
 	training_tweets = clean_tweets(raw_training_tweets)
 	training_set = nltk.classify.apply_features(extract_features, training_tweets) 
 	classifier = nltk.NaiveBayesClassifier.train(training_set)
-	return classifier 
+	return classifier
 	
 
 if __name__ == "__main__":

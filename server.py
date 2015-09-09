@@ -1,5 +1,5 @@
 from flask import Flask, render_template, jsonify, send_from_directory, request
-from model import User, Stock, UserStock, TwitterHandle, Tweet, Sentiment, connect_to_db, db, StockPrice
+from models.model import User, Stock, UserStock, TwitterHandle, Tweet, Sentiment, connect_to_db, db, StockPrice
 import datetime, time
 import requests
 from sqlalchemy.sql import func
