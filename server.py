@@ -7,6 +7,7 @@ import numpy
 
 app = Flask(__name__, static_url_path='')
 
+#TO DO: put constants in a config file
 stocks = {
     'GOOG' : 'Google',
     'TSLA' : 'Tesla',
@@ -27,8 +28,6 @@ NEGATIVE = 'NEGATIVE'
 @app.route("/")
 def index():
 
-    """Loads main page"""
-
     return render_template('index.html')
 
 #hidden route to load static files; takes in file name & displays the file's content
@@ -37,6 +36,7 @@ def static_files(file_name):
 
     return send_from_directory('static', file_name)
 
+#create a jsonobject builder class, so that start_date/end_date can be part of the instance and dont have to pass around as variables
 #creates the json object; outputs json object used to crete datatables & graphs
 @app.route("/json")
 def make_json_object():
@@ -49,6 +49,7 @@ def make_json_object():
     end_date = datetime.datetime.strptime(end,(DATE_FORMAT))
     day_count = (end_date - start_date).days + 1
 
+#make new instance method to get current stock price
     for ticker, name in stocks.iteritems():
         ticker_dict = {
             'name': name,

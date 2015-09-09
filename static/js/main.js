@@ -1,11 +1,10 @@
-//$(document).ready(function () {
 
-//loads dataTable JQuery
 var jsonChartData;
 
-$(function () {
-
+$( document ).ready(function() {
+	
 	var url = '/json?startDate=2015-07-25&endDate=2015-08-17';
+
 	// loadChartData(url);
 	// getChartData(url);
 	getChartData(url);
@@ -62,6 +61,7 @@ $(function () {
         }
         else {
             // Open this row
+            console.log(jsonChartData)
             row.child( createChildTable(row.data()) ).show();
             tr.addClass('shown');
 			var number_companies = jsonChartData['data'].length;
@@ -71,7 +71,7 @@ $(function () {
 					var stockObj = {
 						'data' : [jsonChartData.data[i]]
 					};
-					drawSentimentChart(stock);
+					drawSentimentChart(stockObj);
 					drawStockChart(stockObj);
 				}  
 			}
@@ -120,14 +120,12 @@ $(function () {
 //loads jsonObject for both Charts
 var getChartData = function(url) {
 	$.get(url, function (jsondata){
-		debugger;
-		var jsonChartData = jsondata;
+		jsonChartData = jsondata;
 		drawSentimentChart(jsondata);
 		drawStockChart(jsondata);
-		});
+	});
 };
 
-//draws the Chart
 function drawSentimentChart(jsonblob){
 	// console.log(jsonblob);
 	var scatterData = [];
@@ -165,34 +163,13 @@ function drawSentimentChart(jsonblob){
 	// debugger;
 	var myChart = new Chart(sentiments).Scatter(scatterData, {scaleType: 'date'}); 
 	// debugger;
-	//gradient background color for sentiment graph
-
-	// var scaleMax = myChart.scale["y-axis-1"].max;
-	// var scaleHeight = myChart.scale["y-axis-1"].height;
-	// var allowance = .50;
-	// var bottomPadding = canvas.height - myChart.scales["y-axis-1"].bottom;
-	// var overRatio = allowance/scaleMax;
-	// if(overRatio < 1) {
-	// var tweakedRatio = (bottomPadding + (overRatio*scaleHeight))/canvas.height;
-	// }
-	// else {
-	// var tweakedRatio = 1;
-	// }
 
 	var gradient = sentiments.createLinearGradient(0, canvas.height, 0, 0);
 	gradient.addColorStop(0, "rgba(0, 164, 228,0.2)");  
 	gradient.addColorStop(0, "rgba(0, 164, 228,0.2)"); 
 
-	// if(tweakedRatio < 1) {
-	// // gradient.addColorStop(, "rgba(165, 30, 34,0.2)");   
-	// gradient.addColorStop(1, "rgba(165, 30, 34,0.2)");}
-	// console.log(myChart);
 	myChart.datasets[0].backgroundColor = gradient;
 	myChart.update();
-
-
-
-	  	
 }	
 
 
