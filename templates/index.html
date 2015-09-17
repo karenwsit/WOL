@@ -13,6 +13,8 @@
 	<h1><img class="wollogo" src="/static/img/WOLlogo.png">WOL</h1>
 	<h2> the owl of wol street </h2>
 
+	<h1> View sentiment analysis of your stock portfolio <h1>
+
 	<div class="chart-container text-center">
 		<label for = "sentimentchart"> Sentiment Analysis <br>
 			<canvas id="sentimentchart" width="600" height="400"></canvas> 
@@ -21,18 +23,13 @@
 			<canvas id="stockchart" width="600" height="400"></canvas>
 		</label> 
 	</div>
-	<!-- <form method="get">
-		<input type="text" name="startDate" placeholder="start date" />
-		<input type="text" name="endDate" placeholder="end date" />
-		<button>Submit</button>
-	</form> -->
 	<div class="container">
 		<table id="analysis-table">
 			<thead>
 				<tr>
 					<th> Stock </th>
 					<th> Sentiment </th>
-					<th> Probability </th>
+					<th> Sentiment Probability </th>
 					<th> Current Stock Price </th>
 				</tr>
 			</thead>
