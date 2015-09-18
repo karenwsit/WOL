@@ -6,7 +6,10 @@ db = SQLAlchemy()
 
 
 class User(db.Model):
-    """User of WOL website."""
+    """
+    User of WOL website.
+    Not currently used in the web application but will use for future for more than 1 user
+    """
 
     __tablename__ = "users"
 

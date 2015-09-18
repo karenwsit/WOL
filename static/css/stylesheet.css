@@ -92,8 +92,12 @@ label[for='sentimentchart'] {
 
 .positive {
 	background-image: url('/static/img/happy_owl.png');
+	color: green;
+    font-weight: 900;
 }
 
 .negative {
 	background-image: url('/static/img/sad_owl.png');
+	color: red;
+    font-weight: 900;
 }

@@ -8,15 +8,6 @@ function getFortune() {
 	alert("HEY");
 }
 
-// var companyData;
-// getChartData() {
-// 	... get jsonblob sav as companyData
-// 	call drawGraph(blob);
-// }
-
-// drawGraph(data) {
-// 	... second half of that
-// }
 
 onClick Google {
 var newData = [];

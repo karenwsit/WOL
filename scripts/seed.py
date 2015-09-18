@@ -1,9 +1,9 @@
 """Utility file to seed database from twitter api"""
 
-from model import Stock, TwitterHandle, Tweet, Sentiment, connect_to_db, db, StockPrice
+from models.model import Stock, TwitterHandle, Tweet, Sentiment, connect_to_db, db, StockPrice
 from server import app
 from datetime import datetime
-import classifer
+from sentimentclassifier import get_trained_classifier, create_extract_features_dict
 import os
 import re
 import decimal
@@ -110,12 +110,12 @@ def load_tweets(api_ids=None):
 
 
 def load_sentiments_into_tweettable():
-    tweet_classifier = classifer.get_trained_classifier()
+    tweet_classifier = get_trained_classifier()
     tweets = Tweet.query.all()
 
     for tweet in tweets:
-        sentiment = tweet_classifier.classify(classifer.extract_features(tweet.clean_tweet_text.split()))
-        classifier_object = tweet_classifier.prob_classify(classifer.extract_features(tweet.clean_tweet_text.split()))
+        sentiment = tweet_classifier.classify(create_extract_features_dict(tweet.clean_tweet_text.split()))
+        classifier_object = tweet_classifier.prob_classify(create_extract_features_dict(tweet.clean_tweet_text.split()))
         log_prob = classifier_object.logprob('positive')
         likelihood_probability = decimal.Decimal(pow(2, log_prob))
         tweet.sentiment = sentiment
@@ -163,5 +163,5 @@ def load_stockprices():
 if __name__ == "__main__":
     connect_to_db(app)
     db.create_all()
-
+    load_tweets()
     load_sentiments_into_tweettable()
