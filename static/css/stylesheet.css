@@ -4,24 +4,19 @@
 
 h1 {
 	font-family: Raleway;
-	font-size: 48px;
+	font-size: 80px;
     font-weight: 200;
     margin-bottom: 0;
     vertical-align: bottom;
 }
 
-.wollogo {
-	width: 50px;
-	vertical-align: bottom;
-}
-
 h2 {
 	font-family: Raleway;
 	margin-top: 0;
-    font-size: 20px;
+    font-size: 30px;
     font-weight: 100;
     line-height: 0.75;
-    text-indent: 55px;
+    text-indent: 100px;
 }
 
 label {
@@ -30,6 +25,21 @@ label {
     font-size: 20px;
     line-height: 0.75;
     font-weight: 100;
+    position: relative;
+}
+
+label[for='sentimentchart'] {
+	margin-right: 50px;
+}
+
+.header-container {
+	width: 1250px;
+    margin: 0 auto;
+}
+
+.wollogo {
+	width: 100px;
+	vertical-align: bottom;
 }
 
 .chart-container {
@@ -37,13 +47,29 @@ label {
 	margin-top: 75px;
 }
 
-label[for='sentimentchart'] {
-	margin-right: 50px;
+
+/*
+ * Chart Axis
+ */
+.x-axis {
+	margin-top: 20px;
 }
 
-#sentimentchart {
+.y-axis {
+	display: inline-block;
+    transform: translateX(-50%) rotate(-90deg);
+    position: absolute;
+    left: -1em;
+    top: 50%;
+}
+
+.sentimentchart {
 	background: linear-gradient(to bottom, rgba(50, 200, 80, 0.05) 50%, rgba(200, 10, 30, .04) 50%);
 }
+
+/*
+ * Datatables
+ */
 
 .dataTable {
 	font-size: 16px;	

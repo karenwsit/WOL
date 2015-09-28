@@ -35,7 +35,7 @@ class JsonBuilder(object):
         return self.json_object
 
     def _create_json_object(self):
-
+        main_list = []
         for ticker, name in JsonBuilder.STOCKS.iteritems():
             ticker_dict = {
                 'name': name,
@@ -45,7 +45,6 @@ class JsonBuilder(object):
             #a double assignment from the output of _create_data_dict_for_each_date function. ticker_dict['dates'] = date_dict & ticker_dict['overall_prob'] = sentiment_prob
             ticker_dict['dates'], ticker_dict['overall_prob'] = self._create_data_dict_for_each_date(ticker, name)
             ticker_dict['overall_sentiment'] = JsonBuilder.POSITIVE if ticker_dict['overall_prob'] >= .5 else JsonBuilder.NEGATIVE
-            main_list = []
             main_list.append(ticker_dict)
 
         json_object = {'data': main_list}

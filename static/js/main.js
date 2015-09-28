@@ -73,7 +73,7 @@ $( document ).ready(function() {
     });
 
     // Creates the jQuery DataTable child tables; takes in json object data & outputs specific tweets & dates
-    //  
+     
     function createChildTable (data) {
         var dateTable = $('<table class="child-table">' +
             '<thead><tr>'+
@@ -154,7 +154,7 @@ function drawSentimentChart(jsonblob){
 
     var sentiments = document.getElementById('sentimentchart').getContext('2d');
     var canvas = document.getElementById('sentimentchart');
-    var myChart = new Chart(sentiments).Scatter(scatterData, {scaleType: 'date'});
+    var myChart = new Chart(sentiments).Scatter(scatterData, {scaleType: 'date'}, {legendTemplate: "<ul class=\"<%=name.toLowerCase()%>-legend\"><%for(var i=0;i<datasets.length;i++){%><li><span class=\"<%=name.toLowerCase()%>-legend-marker\" style=\"background-color:<%=datasets[i].strokeColor%>\"></span><%=datasets[i].label%></li><%}%></ul>"});
     var gradient = sentiments.createLinearGradient(0, canvas.height, 0, 0);
     gradient.addColorStop(0, "rgba(0, 164, 228,0.2)");
     gradient.addColorStop(0, "rgba(0, 164, 228,0.2)");

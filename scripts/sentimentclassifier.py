@@ -6,12 +6,11 @@ import csv
 Training & Testing NaiveBayesClassifier
 
 """
-#global variable used in create_extract_features_dict; list of most frequent words in tweets
-word_features = []
+word_features = None
 
 
 def read_file():
-    with open('1.6milliontrainingtweets.csv', 'r') as f:
+    with open('1thousandtraining.csv', 'r') as f:
         tweet_list = []
         for row in csv.reader(f.read().splitlines()):
             tweet = row[5]
@@ -38,6 +37,7 @@ def create_word_features(tweet_words):
     for (words, sentiment) in tweet_words:
         all_words.extend(words)
     word_list = nltk.FreqDist(all_words)
+    global word_features
     word_features = word_list.keys()
     return word_features
 
@@ -45,6 +45,7 @@ def create_word_features(tweet_words):
 def create_extract_features_dict(document):
     document_words = set(document)
     features = {}
+    global word_features
     for word in word_features:
         features['contains(%s)' % word] = (word in document_words)
     return features
@@ -55,8 +56,12 @@ def get_trained_classifier():
     training_tweets = tokenize_tweets(raw_training_tweets)
     word_features = create_word_features(training_tweets)
     training_set = nltk.classify.apply_features(create_extract_features_dict, training_tweets)
+    # import pdb; pdb.set_trace()
     classifier = nltk.NaiveBayesClassifier.train(training_set)
+    print "THIS WORKS!!!"
+    print classifier
     return classifier
+
 
 
 if __name__ == "__main__":

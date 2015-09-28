@@ -31,6 +31,12 @@ def index():
     return render_template('index.html')
 
 
+@app.route("/static/<path:file_name>")
+def static_files(file_name):
+
+    return send_from_directory('static', file_name)
+
+
 @app.route("/json")
 def make_json_object():
 

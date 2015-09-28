@@ -10,17 +10,25 @@
 	<title> WOL </title>
 </head>
 <body>
-	<h1><img class="wollogo" src="/static/img/WOLlogo.png">WOL</h1>
-	<h2> the owl of wol street </h2>
+	<header class="header-container">
+		<h1><img class="wollogo" src="/static/img/WOLlogo.png">WOL</h1>
+		<h2> The Owl of WOL Street: view the sentiment analysis of stocks in your portfolio </h2>
 
-	<h1> View the sentiment analysis of stocks in your portfolio <h1>
-
+	</header>
 	<div class="chart-container text-center">
-		<label for = "sentimentchart"> Sentiment Analysis <br>
-			<canvas id="sentimentchart" width="600" height="400"></canvas> 
+		<label for = "sentimentchart">
+			<h3>Sentiment Analysis</h3>
+			<br>
+			<canvas class="sentimentchart" id="sentimentchart" width="600" height="400"></canvas>
+			<div class="y-axis"> Sentiment Probability </div>
+			<div class="x-axis"> Date </div>  
 		</label>
-		<label for = "stockchart"> Stock Price <br>
+		<label for = "stockchart"> 
+			<h3> Historical Stock Price</h3> 
+			<br>
 			<canvas id="stockchart" width="600" height="400"></canvas>
+			<div class="y-axis"> Stock Price </div>
+			<div class="x-axis"> Date </div>  
 		</label> 
 	</div>
 	<div class="container">
