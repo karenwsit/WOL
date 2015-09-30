@@ -1,7 +1,5 @@
 # WOL - the owl of wol street
 
-![Logo](/static/img/WOLReadMeLogo.png)
-
 ### Overview
 WOL is a fullstack web application that creates data visualizations of tweet sentiments of particular companies in a user's financial portfolio. Tweets are normalized, tokenized, and analyzed using natural language processing. Users are able to conduct exploratory visual analysis and view sentiment patterns/trends to ultimately help users decide when to buy or sell stocks.
 
