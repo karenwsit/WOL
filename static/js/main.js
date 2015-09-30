@@ -40,12 +40,14 @@ $( document ).ready(function() {
         }
     });
 
+    //TO DO: Confirm with Phil Long
     var apiTable = new $.fn.dataTable.Api( '#analysis-table' );
 
 
     $('tbody').on('click', '.stock-row', function(){
         var tr = $(this);
         var row = apiTable.row(tr);
+        // stella THINKS its the companie's name
         var stockName = $(this).children('.sorting_1').text();
  
         if ( row.child.isShown() ) {

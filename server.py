@@ -39,7 +39,7 @@ def static_files(file_name):
 
 @app.route("/json")
 def make_json_object():
-
+ 
     json_instance = JsonBuilder()
     json_object = jsonify(json_instance.get_json())
     return json_object

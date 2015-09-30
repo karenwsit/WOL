@@ -1,6 +1,9 @@
+import time
 import nltk.classify.util
 import re
 import csv
+import pickle
+import os.path
 
 """
 Training & Testing NaiveBayesClassifier
@@ -9,8 +12,26 @@ Training & Testing NaiveBayesClassifier
 word_features = None
 
 
-def read_file():
-    with open('1thousandtraining.csv', 'r') as f:
+def split_training_file():
+    save_path = '/Users/karensit/src/HB_Project/csv_files'
+    output_base = 'output'
+    at = 5000
+    split_len = 5000
+
+    big_file = open('10KTweets.csv', 'r')
+    split_file = big_file.read().splitlines()
+    for lines in range(0, len(split_file), split_len):
+        output_data = split_file[lines:lines+split_len]
+        complete_name = os.path.join(save_path, output_base + str(at) + ".csv")
+        output = open(complete_name, 'w')
+        output.write('\n'.join(output_data))
+        output.close()
+        at += 5000
+    return
+
+
+def read_file(small_file):
+    with open('small_file', 'r') as f:
         tweet_list = []
         for row in csv.reader(f.read().splitlines()):
             tweet = row[5]
@@ -52,17 +73,22 @@ def create_extract_features_dict(document):
 
 
 def get_trained_classifier():
+    split_training_file()
+    # for file_name in os.listdir('.'):
+    #     if os.path.isfile(file_name):
+
     raw_training_tweets = read_file()
     training_tweets = tokenize_tweets(raw_training_tweets)
     word_features = create_word_features(training_tweets)
     training_set = nltk.classify.apply_features(create_extract_features_dict, training_tweets)
-    # import pdb; pdb.set_trace()
     classifier = nltk.NaiveBayesClassifier.train(training_set)
-    print "THIS WORKS!!!"
-    print classifier
     return classifier
 
 
 
 if __name__ == "__main__":
-    get_trained_classifier()
+    start = time.clock()
+    # get_trained_classifier()
+    split_training_file()
+    duration = (time.clock() - start)*1000
+    print "TIME IT TAKES TO RUN THIS FILE: %f" % (duration)
