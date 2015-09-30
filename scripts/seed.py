@@ -75,7 +75,6 @@ def load_tweets(api_ids=None):
             my_results = json.load(urllib.urlopen(
                 "https://www.kimonolabs.com/api/%s?apikey=%s" % (api_id, consumer_key))
             )
-
             collection1_list = my_results['results']['collection1']
             stock_ticker = Stock.query.filter_by(stock_name=my_results['name']).first()
             if stock_ticker:
