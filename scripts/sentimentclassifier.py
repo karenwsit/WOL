@@ -17,7 +17,6 @@ def split_training_file():
     output_base = 'output'
     at = 5000
     split_len = 5000
-
     big_file = open('10KTweets.csv', 'r')
     split_file = big_file.read().splitlines()
     for lines in range(0, len(split_file), split_len):
@@ -31,7 +30,8 @@ def split_training_file():
 
 
 def read_file(small_file):
-    with open('small_file', 'r') as f:
+    save_path = '/Users/karensit/src/HB_Project/csv_files'
+    with open(os.path.join(save_path, small_file), 'r') as f:
         tweet_list = []
         for row in csv.reader(f.read().splitlines()):
             tweet = row[5]
@@ -74,21 +74,19 @@ def create_extract_features_dict(document):
 
 def get_trained_classifier():
     split_training_file()
-    # for file_name in os.listdir('.'):
-    #     if os.path.isfile(file_name):
-
-    raw_training_tweets = read_file()
-    training_tweets = tokenize_tweets(raw_training_tweets)
-    word_features = create_word_features(training_tweets)
-    training_set = nltk.classify.apply_features(create_extract_features_dict, training_tweets)
-    classifier = nltk.NaiveBayesClassifier.train(training_set)
-    return classifier
-
-
+    for file_name in os.listdir('/Users/karensit/src/HB_Project/csv_files'):
+        if file_name.endswith(".csv"):
+            raw_training_tweets = read_file(file_name)
+            training_tweets = tokenize_tweets(raw_training_tweets)
+            word_features = create_word_features(training_tweets)
+            training_set = nltk.classify.apply_features(create_extract_features_dict, training_tweets)
+            classifier = nltk.NaiveBayesClassifier.train(training_set)
+            return classifier
+        print "reached a non .csv file"
+        return
 
 if __name__ == "__main__":
     start = time.clock()
-    # get_trained_classifier()
-    split_training_file()
+    get_trained_classifier()
     duration = (time.clock() - start)*1000
     print "TIME IT TAKES TO RUN THIS FILE: %f" % (duration)
