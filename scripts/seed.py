@@ -1,4 +1,4 @@
-"""Script file to seed database from topsysearch.py"""
+"""Script file to seed database"""
 
 from models.model import Stock, TwitterHandle, Tweet, Sentiment, connect_to_db, db, StockPrice
 from server import app
@@ -11,6 +11,31 @@ from urllib2 import Request, urlopen
 import urllib
 import json
 
+STOCKS = {
+    'GOOG': 'Google',
+    'TSLA': 'Tesla',
+    'CMG': 'Chipotle',
+    'DIS': 'Disney',
+    'AAPL': 'Apple',
+    'NKE': 'Nike',
+    'BABA': 'Alibaba',
+    'MSFT': 'Microsoft',
+    'TWTR': 'Twitter',
+    'FB': 'Facebook',
+}
+
+KIMONO_API_IDS = {
+    'Google': ['2lgdxjpq', 'awexe96c', '9a7rbjs4', '9r4xnuiq'],
+    'Tesla': ['3n9ge4xs'],
+    'Chipotle': ['6w1fc7gq'],
+    'Disney': ['awkdxbz6'],
+    'Apple': ['3b2h1ezc', 'd61do17k', 'bglx9jqk', '6fmv92pk'],
+    'Nike': ['5ejpmmty'],
+    'Alibaba': ['clsw9yzo'],
+    'Microsoft': ['cdtuqhxu', 'eacxst54'],
+    'Twitter': ['bgodnive', '8hbdw9vo', '1xccxxk6'],
+    'Facebook': ['8mhmw11c', '2bmg3uii', '66jhvw3g']
+}
 
 def load_twitterhandles():
     """Loads twitterhandles from twitterhandles.txt into database"""
@@ -26,19 +51,6 @@ def load_twitterhandles():
 
     db.session.commit()
 
-STOCKS = {
-    'GOOG': 'Google',
-    'TSLA': 'Tesla',
-    'CMG': 'Chipotle',
-    'DIS': 'Disney',
-    'AAPL': 'Apple',
-    'NKE': 'Nike',
-    'BABA': 'Alibaba',
-    'MSFT': 'Microsoft',
-    'TWTR': 'Twitter',
-    'FB': 'Facebook',
-}
-
 
 def load_stocks():
     """Loads stocks from stocks' dictionary into database"""
@@ -49,20 +61,6 @@ def load_stocks():
         db.session.merge(new_stock)
 
     db.session.commit()
-
-
-KIMONO_API_IDS = {
-    'Google': ['2lgdxjpq', 'awexe96c', '9a7rbjs4', '9r4xnuiq'],
-    'Tesla': ['3n9ge4xs'],
-    'Chipotle': ['6w1fc7gq'],
-    'Disney': ['awkdxbz6'],
-    'Apple': ['3b2h1ezc', 'd61do17k', 'bglx9jqk', '6fmv92pk'],
-    'Nike': ['5ejpmmty'],
-    'Alibaba': ['clsw9yzo'],
-    'Microsoft': ['cdtuqhxu', 'eacxst54'],
-    'Twitter': ['bgodnive', '8hbdw9vo', '1xccxxk6'],
-    'Facebook': ['8mhmw11c', '2bmg3uii', '66jhvw3g']
-}
 
 
 def load_tweets(api_ids=None):
@@ -80,14 +78,14 @@ def load_tweets(api_ids=None):
             if stock_ticker:
                 stock_ticker_id = stock_ticker.stock_name
 
-            for i in collection1_list:
-                timestamp = i['timeago']['data-timestamp']
+            for result in collection1_list:
+                timestamp = result['timeago']['data-timestamp']
                 tweet_created_at = datetime.fromtimestamp(int(timestamp))
-                raw_tweet_text = i['tweet']['text']
+                raw_tweet_text = result['tweet']['text']
                 clean_tweet_text1 = re.sub(r"http\S+", "", raw_tweet_text)
                 clean_tweet_text = re.sub(r"@\S+", "", clean_tweet_text1).replace('"','').replace(',','').replace('.','').strip()
-                tweet_url = i['timeago']['href']
-                twitter_handle_dirty = i['twitterhandle']['text']
+                tweet_url = result['timeago']['href']
+                twitter_handle_dirty = result['twitterhandle']['text']
                 twitter_handle_clean = twitter_handle_dirty[twitter_handle_dirty.find('@')+1:]
                 stock = Stock.query.filter_by(stock_name=company_name).first()
                 if stock:

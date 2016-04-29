@@ -28,7 +28,6 @@ class JsonBuilder(object):
         self.start_date = datetime.datetime.strptime(start, (JsonBuilder.DATE_FORMAT))
         self.end_date = datetime.datetime.strptime(end, (JsonBuilder.DATE_FORMAT))
         self.day_count = (self.end_date - self.start_date).days + 1
-
         self.json_object = self._create_json_object()
 
     def get_json(self):

@@ -7,8 +7,8 @@ db = SQLAlchemy()
 
 class User(db.Model):
     """
-    User of WOL website.
-    Not currently used in the web application but will use for future for more than 1 user
+    User of WOL website
+    Not currently used in the web application but will use in future for more than 1 user
     """
 
     __tablename__ = "users"
@@ -16,12 +16,11 @@ class User(db.Model):
     user_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
 
     def __repr__(self):
-        """Provides helpful representation when printed"""
         return "<User user_id=%s>" % (self.user_id)
 
 
 class Stock(db.Model):
-    """Stock on WOL website."""
+    """Stocks on WOL website"""
 
     __tablename__ = "stocks"
 
@@ -29,12 +28,11 @@ class Stock(db.Model):
     stock_name = db.Column(db.String(32), nullable=False)
 
     def __repr__(self):
-        """Provides helpful representation when printed"""
         return "<Stock stockticker_id=%s stock_name=%s>" % (self.stockticker_id, self.stock_name)
 
 
 class StockPrice(db.Model):
-    """Stock Prices on WOL website."""
+    """Historical Stock Prices on WOL website"""
 
     __tablename__ = "stockprices"
 
@@ -44,12 +42,14 @@ class StockPrice(db.Model):
     stock_price = db.Column(db.Integer, nullable=False)
 
     def __repr__(self):
-        """Provides helpful representation when printed"""
         return "<StockPrice stockprice_id=%s stockticker_id=%s date=%s stock_price=%s>" % (self.stockprice_id, self.stockticker_id, self.date, self.stock_price)
 
 
 class UserStock(db.Model):
-    """Reference table for User and Stock"""
+    """
+    Reference table for User and Stock
+    Not currently used in the web application but will use in future for more than 1 user
+    """
 
     __tablename__ = "userstocks"
 
@@ -64,12 +64,11 @@ class UserStock(db.Model):
     stock = db.relationship("Stock", backref=db.backref("userstocks", order_by=userstock_id))
 
     def __repr__(self):
-        """Provides helpful representation when printed"""
         return "<UserStock userstock_id=%s user_id=%s stockticker_id=%s>" % (self.userstock_id, self.user_id, self.stockticker_id)
 
 
 class TwitterHandle(db.Model):
-    """TwitterHandle to query from"""
+    """Curated TwitterHandles from news sources, market influencers, research"""
 
     __tablename__ = "twitterhandles"
 
@@ -123,7 +122,7 @@ class Sentiment(db.Model):
 
 
 def connect_to_db(app):
-    """Connect database to Flask app."""
+    """Connect database to Flask app"""
 
     #Configure to use SQLite database
     app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///wol.db'
@@ -135,4 +134,3 @@ if __name__ == "__main__":
 
     from server import app
     connect_to_db(app)
-    print "Connected to DB."

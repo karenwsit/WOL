@@ -1,4 +1,4 @@
-"""Training & Testing NaiveBayesClassifier"""
+"""Creating & Training a Naive Bayes Classifier"""
 
 import nltk.classify.util
 import re
@@ -10,23 +10,25 @@ word_features = None
 
 
 def split_training_file():
+    #created smaller training files from one large file
     save_path = '/Users/karensit/src/HB_Project/csv_files'
     output_base = 'output'
-    at = 5000
+    tweet_num = 5000
     split_len = 5000
-    big_file = open('10KTweets.csv', 'r')
+    big_file = open('training.1600000.csv', 'r')
     split_file = big_file.read().splitlines()
     for lines in range(0, len(split_file), split_len):
         output_data = split_file[lines:lines+split_len]
-        complete_name = os.path.join(save_path, output_base + str(at) + ".csv")
+        complete_name = os.path.join(save_path, output_base + str(tweet_num) + ".csv")
         output = open(complete_name, 'w')
         output.write('\n'.join(output_data))
         output.close()
-        at += 5000
+        tweet_num += 5000
     return
 
 
 def read_file(small_file):
+    #reads & cleans tweets from smaller training files and output_base tweet tuples with tweet & sentiment
     save_path = '/Users/karensit/src/HB_Project/csv_files'
     with open(os.path.join(save_path, small_file), 'r') as f:
         tweet_list = []
@@ -54,13 +56,15 @@ def create_word_features(tweet_words):
     all_words = []
     for (words, sentiment) in tweet_words:
         all_words.extend(words)
-    word_list = nltk.FreqDist(all_words)
+    #nltk.FreqDist orders every distinct word by frequency of appearance
+    word_dict = nltk.FreqDist(all_words)
     global word_features
-    word_features = word_list.keys()
+    word_features = word_dict.keys()
     return word_features
 
 
 def create_extract_features_dict(document):
+    #this will indicate which words are contained in the input passed
     document_words = set(document)
     features = {}
     global word_features
@@ -70,7 +74,6 @@ def create_extract_features_dict(document):
 
 
 def get_trained_classifier():
-    split_training_file()
     for file_name in os.listdir('/Users/karensit/src/HB_Project/csv_files'):
         if file_name.endswith(".csv"):
             raw_training_tweets = read_file(file_name)
