@@ -1,4 +1,4 @@
-"""Utility file to seed database from twitter api"""
+"""Script file to seed database from topsysearch.py"""
 
 from models.model import Stock, TwitterHandle, Tweet, Sentiment, connect_to_db, db, StockPrice
 from server import app
@@ -139,9 +139,9 @@ def load_stockprices():
         yql_url = """https://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20yahoo.finance.historicaldata%20where%20symbol%20%3D%20%22"""+stock_ticker+"""%22%20and%20startDate%20%3D%20%222015-07-17%22%20and%20endDate%20%3D%20%222015-08-17%22&format=json&diagnostics=true&env=store%3A%2F%2Fdatatables.org%2Falltableswithkeys&callback="""
         req = Request(yql_url)
         result_str = urlopen(req)
-        data = json.loads(result_str.read())
+        yahoo_stockprice = json.loads(result_str.read())
 
-        stock_dict = data['query']['results']
+        stock_dict = yahoo_stockprice['query']['results']
         stock_dict_value = stock_dict['quote']
 
         for i in range(len(stock_dict_value)):
@@ -162,5 +162,3 @@ def load_stockprices():
 if __name__ == "__main__":
     connect_to_db(app)
     db.create_all()
-    load_tweets()
-    load_sentiments_into_tweettable()

@@ -1,6 +1,7 @@
 
 var jsonChartData;
 
+// when all of the html in index.html in the page has loaded, you run the function below
 $( document ).ready(function() {
     
     var url = '/json';
@@ -112,6 +113,7 @@ $( document ).ready(function() {
 });
 
 //loads jsonObject for both Charts
+//gets called after the page loads/after the DOM is created which is why it sits outside of document.ready
 var getChartData = function(url) {
     $.get(url, function (jsondata){
         jsonChartData = jsondata;
@@ -121,11 +123,8 @@ var getChartData = function(url) {
 };
 
 function drawSentimentChart(jsonblob){
-    // console.log(jsonblob);
     var scatterData = [];
     var strokeColor = ['#4FB7C0','#F99E15', '#DA6E12', '#DA4321', '#F91A15', '#F9244F', '#DA20A3', '#DB2FF1', '#9220DA', '#6D24F9'];
-        
-    // jsondata.data = Array(jsondata['data'][0]);
 
     for (var i=0; i < jsonblob['data'].length; i++){
         // for each stock, make a data obj

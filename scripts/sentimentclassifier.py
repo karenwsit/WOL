@@ -1,14 +1,11 @@
-import time
+"""Training & Testing NaiveBayesClassifier"""
+
 import nltk.classify.util
 import re
 import csv
-import pickle
 import os.path
 
-"""
-Training & Testing NaiveBayesClassifier
 
-"""
 word_features = None
 
 
@@ -82,11 +79,6 @@ def get_trained_classifier():
             training_set = nltk.classify.apply_features(create_extract_features_dict, training_tweets)
             classifier = nltk.NaiveBayesClassifier.train(training_set)
             return classifier
-        print "reached a non .csv file"
-        return
 
 if __name__ == "__main__":
-    start = time.clock()
     get_trained_classifier()
-    duration = (time.clock() - start)*1000
-    print "TIME IT TAKES TO RUN THIS FILE: %f" % (duration)
