@@ -39,18 +39,9 @@ def static_files(file_name):
 
 @app.route("/json")
 def make_json_object():
-    json_instance = JsonBuilder() 
+    json_instance = JsonBuilder()
     json_object = jsonify(json_instance.get_json()) # this will return a python dictionary which is jsonify will turn into a JSON string
     return json_object
-
-
-def get_stockprice(stock_ticker=None):
-
-    stockprice_url_template = 'http://finance.yahoo.com/webservice/v1/symbols/{0}/quote?format=json'
-    stockprice_url = stockprice_url_template.format(stock_ticker)
-    req = requests.get(stockprice_url)
-    data = req.json()
-    return data['list']['resources'][0]['resource']['fields']['price']
 
 
 if __name__ == "__main__":
